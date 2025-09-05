@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tender Insight Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        button {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .results-section {
+            padding: 30px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .results-count {
+            font-size: 1.2em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .tenders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .tender-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .tender-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .tender-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .tender-details {
+            color: #6c757d;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .tender-details div {
+            margin-bottom: 5px;
+        }
+
+        .tender-budget {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #27ae60;
+            margin: 10px 0;
+        }
+
+        .tender-deadline {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+
+        .error {
+            background: #ffe6e6;
+            color: #c0392b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #c0392b;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .form-group {
+                min-width: 100%;
+            }
+            
+            .tenders-grid {
+                grid-template-columns: 1fr;
+            }]
+            .filters {
+    margin-top: 20px;
+    border-top: 2px solid #e9ecef;
+    padding-top: 20px;
+}
+
+.filters h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.filters .search-form {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.filters button {
+    margin-top: 15px;
+}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Tender Insight Hub</h1>
+            <p>Find and analyze public procurement opportunities for South African SMEs</p>
+        </header>
+
+        <section class="search-section">
+            <form class="search-form" id="searchForm">
+                <div class="form-group">
+                    <label for="keywords">Search Keywords</label>
+                    <input 
+                        type="text" 
+                        id="keywords" 
+                        placeholder="e.g., construction, security services, IT"
+                        value="construction"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="province">Province (Optional)</label>
+                    <select id="province">
+                        <option value="">All Provinces</option>
+                        <option value="Eastern Cape">Eastern Cape</option>
+                        <option value="Free State">Free State</option>
+                        <option value="Gauteng">Gauteng</option>
+                        <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                        <option value="Limpopo">Limpopo</option>
+                        <option value="Mpumalanga">Mpumalanga</option>
+                        <option value="Northern Cape">Northern Cape</option>
+                        <option value="North West">North West</option>
+                        <option value="Western Cape">Western Cape</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="buyer">Buyer Organization (Optional)</label>
+                    <input 
+                        type="text" 
+                        id="buyer" 
+                        placeholder="e.g., Department of Transport"
+                    >
+                </div>
+
+                <button type="submit">Search Tenders</button>
+            </form>
+            <div class="filters" id="filtersSection" style="display: none;">
+        <h3 style="margin: 20px 0 15px 0; color: #2c3e50;">Filter Results</h3>
+        
+        <div class="search-form" style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+            <div class="form-group">
+                <label for="budgetMin">Budget Range (ZAR)</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="number" id="budgetMin" placeholder="Min" style="flex: 1;">
+                    <span>to</span>
+                    <input type="number" id="budgetMax" placeholder="Max" style="flex: 1;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="deadlineRange">Submission Deadline</label>
+                <select id="deadlineRange">
+                    <option value="">Any time</option>
+                    <option value="7">Next 7 days</option>
+                    <option value="30">Next 30 days</option>
+                    <option value="90">Next 90 days</option>
+                    <option value="expired">Past deadlines</option>
+                </select>
+            </div>
+
+            <button type="button" onclick="applyFilters()" style="background: #3498db;">
+                Apply Filters
+            </button>
+            <button type="button" onclick="clearFilters()" style="background: #e74c3c; margin-left: 10px;">
+                Clear Filters
+            </button>
+        </div>
+    </div>
+        </section>
+
+        <section class="results-section">
+            <div class="results-header">
+                <div class="results-count" id="resultsCount">Search for tenders to see results</div>
+            </div>
+            
+            <div id="loading" class="loading" style="display: none;">
+                <div>Searching for tenders...</div>
+            </div>
+            
+            <div id="error" class="error" style="display: none;"></div>
+            
+            <div class="tenders-grid" id="tendersGrid">
+                <!-- Tender cards will be inserted here -->
+            </div>
+        </section>
+    </div>
+
+    <script>
+    // Use relative path for API calls
+    const API_BASE = window.location.origin;
+    
+    document.getElementById('searchForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const keywords = document.getElementById('keywords').value.trim();
+        const province = document.getElementById('province').value;
+        const buyer = document.getElementById('buyer').value.trim();
+        
+        if (!keywords) {
+            showError('Please enter some keywords to search');
+            return;
+        }
+        
+        await searchTenders(keywords, province, buyer);
+    });
+
+    function showError(message) {
+        const errorDiv = document.getElementById('error');
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000);
+    }
+
+    function showLoading(show) {
+        document.getElementById('loading').style.display = show ? 'block' : 'none';
+    }
+
+    function formatCurrency(amount) {
+        if (!amount) return 'Not specified';
+        return new Intl.NumberFormat('en-ZA', {
+            style: 'currency',
+            currency: 'ZAR'
+        }).format(amount);
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return 'Not specified';
+        try {
+            return new Date(dateString).toLocaleDateString('en-ZA', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        } catch (e) {
+            return dateString; // Return raw string if date parsing fails
+        }
+    }
+
+    async function searchTenders(keywords, province, buyer) {
+        showLoading(true);
+        document.getElementById('error').style.display = 'none';
+        
+        try {
+            // Build query parameters
+            const params = new URLSearchParams();
+            params.append('keywords', keywords);
+            if (province) params.append('province', province);
+            if (buyer) params.append('buyer', buyer);
+            
+            const response = await fetch(`${API_BASE}/api/tenders/search?${params}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            displayResults(data);
+            
+        } catch (error) {
+            console.error('Search error:', error);
+            showError('Failed to search tenders. Please check if the API server is running.');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+   function displayResults(data) {
+    const resultsGrid = document.getElementById('tendersGrid');
+    const resultsCount = document.getElementById('resultsCount');
+    
+    resultsGrid.innerHTML = '';
+    
+    if (data.results && data.results.length > 0) {
+        resultsCount.textContent = `Found ${data.count} tenders for "${data.search_term}"`;
+        
+        data.results.forEach(tender => {
+            const tenderCard = document.createElement('div');
+            tenderCard.className = 'tender-card';
+            
+            tenderCard.innerHTML = `
+                <h3 class="tender-title">${tender.title || 'No title'}</h3>
+                <div class="tender-details">
+                    <div><strong>Publisher:</strong> ${tender.publisher?.name || 'Not specified'}</div>
+                    <div><strong>Province:</strong> ${tender.province || 'Not specified'}</div>
+                    <div><strong>Buyer:</strong> ${tender.buyer?.name || 'Not specified'}</div>
+                </div>
+                ${tender.value?.amount ? `
+                    <div class="tender-budget">
+                        Budget: ${formatCurrency(tender.value.amount)}
+                    </div>
+                ` : ''}
+                <div class="tender-deadline">
+                    <strong>Deadline:</strong> ${formatDate(tender.tender?.tenderPeriod?.endDate)}
+                </div>
+                ${tender.description ? `
+                    <div class="tender-details" style="margin-top: 15px;">
+                        <strong>Description:</strong> ${tender.description}
+                    </div>
+                ` : ''}
+            `;
+            
+            resultsGrid.appendChild(tenderCard);
+        });
+    } else {
+        if (data.error) {
+            resultsCount.textContent = 'API Error: Could not fetch tenders';
+            resultsGrid.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #e74c3c;">
+                    <div style="font-size: 3em; margin-bottom: 10px;">⚠️</div>
+                    <div>Error connecting to eTenders API</div>
+                    <div style="margin-top: 10px; font-size: 0.9em; color: #7f8c8d;">
+                        Please check your internet connection and try again
+                    </div>
+                </div>
+            `;
+        } else {
+            resultsCount.textContent = `No tenders found for "${data.search_term}"`;
+            resultsGrid.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #6c757d;">
+                    <div style="font-size: 3em; margin-bottom: 10px;">🔍</div>
+                    <div>No tenders match your search criteria</div>
+                    <div style="margin-top: 10px; font-size: 0.9em;">
+                        Try different keywords or check the API status
+                    </div>
+                </div>
+            `;
+        }
+    }
+}
+let allTenders = []; // Store all tenders from search
+let filteredTenders = []; // Store filtered tenders
+
+// Add this function to handle search results
+function displayResults(data) {
+    const resultsGrid = document.getElementById('tendersGrid');
+    const resultsCount = document.getElementById('resultsCount');
+    
+    resultsGrid.innerHTML = '';
+    
+    if (data.results && data.results.length > 0) {
+        // Store all tenders for filtering
+        allTenders = data.results;
+        filteredTenders = [...allTenders];
+        
+        resultsCount.textContent = `Found ${data.count} tenders for "${data.search_term}"`;
+        
+        // Show filters section
+        document.getElementById('filtersSection').style.display = 'block';
+        
+        // Display all results initially
+        renderTenders(allTenders);
+        
+    } else {
+        allTenders = [];
+        filteredTenders = [];
+        document.getElementById('filtersSection').style.display = 'none';
+        
+        if (data.error) {
+            resultsCount.textContent = 'API Error: Could not fetch tenders';
+            resultsGrid.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #e74c3c;">
+                    <div style="font-size: 3em; margin-bottom: 10px;">⚠️</div>
+                    <div>Error connecting to eTenders API</div>
+                </div>
+            `;
+        } else {
+            resultsCount.textContent = `No tenders found for "${data.search_term}"`;
+            resultsGrid.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #6c757d;">
+                    <div style="font-size: 3em; margin-bottom: 10px;">🔍</div>
+                    <div>No tenders match your search criteria</div>
+                </div>
+            `;
+        }
+    }
+}
+
+function renderTenders(tenders) {
+    const resultsGrid = document.getElementById('tendersGrid');
+    resultsGrid.innerHTML = '';
+    
+    if (tenders.length === 0) {
+        resultsGrid.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #6c757d;">
+                <div style="font-size: 3em; margin-bottom: 10px;">🔍</div>
+                <div>No tenders match your filter criteria</div>
+            </div>
+        `;
+        return;
+    }
+    
+    tenders.forEach(tender => {
+        const tenderCard = document.createElement('div');
+        tenderCard.className = 'tender-card';
+        
+        const amount = tender.value?.amount || 0;
+        const endDate = tender.tender?.tenderPeriod?.endDate;
+        
+        tenderCard.innerHTML = `
+            <h3 class="tender-title">${tender.title || 'No title'}</h3>
+            <div class="tender-details">
+                <div><strong>Publisher:</strong> ${tender.publisher?.name || 'Not specified'}</div>
+                <div><strong>Province:</strong> ${tender.province || 'Not specified'}</div>
+                <div><strong>Buyer:</strong> ${tender.buyer?.name || 'Not specified'}</div>
+                ${amount ? `<div><strong>Budget:</strong> ${formatCurrency(amount)}</div>` : ''}
+                ${endDate ? `<div><strong>Deadline:</strong> ${formatDate(endDate)}</div>` : ''}
+            </div>
+            ${tender.description ? `
+                <div class="tender-details" style="margin-top: 15px;">
+                    <strong>Description:</strong> ${tender.description}
+                </div>
+            ` : ''}
+        `;
+        
+        resultsGrid.appendChild(tenderCard);
+    });
+}
+
+function applyFilters() {
+    const budgetMin = document.getElementById('budgetMin').value ? parseInt(document.getElementById('budgetMin').value) : 0;
+    const budgetMax = document.getElementById('budgetMax').value ? parseInt(document.getElementById('budgetMax').value) : Infinity;
+    const deadlineRange = document.getElementById('deadlineRange').value;
+    
+    filteredTenders = allTenders.filter(tender => {
+        const amount = tender.value?.amount || 0;
+        const endDate = tender.tender?.tenderPeriod?.endDate;
+        
+        // Budget filter
+        if (amount < budgetMin || amount > budgetMax) {
+            return false;
+        }
+        
+        // Deadline filter
+        if (deadlineRange && endDate) {
+            const deadlineDate = new Date(endDate);
+            const today = new Date();
+            
+            switch (deadlineRange) {
+                case '7':
+                    const nextWeek = new Date();
+                    nextWeek.setDate(today.getDate() + 7);
+                    if (deadlineDate < today || deadlineDate > nextWeek) return false;
+                    break;
+                case '30':
+                    const nextMonth = new Date();
+                    nextMonth.setDate(today.getDate() + 30);
+                    if (deadlineDate < today || deadlineDate > nextMonth) return false;
+                    break;
+                case '90':
+                    const nextQuarter = new Date();
+                    nextQuarter.setDate(today.getDate() + 90);
+                    if (deadlineDate < today || deadlineDate > nextQuarter) return false;
+                    break;
+                case 'expired':
+                    if (deadlineDate >= today) return false;
+                    break;
+            }
+        }
+        
+        return true;
+    });
+    
+    // Update results count
+    document.getElementById('resultsCount').textContent = 
+        `Showing ${filteredTenders.length} of ${allTenders.length} tenders after filtering`;
+    
+    renderTenders(filteredTenders);
+}
+
+function clearFilters() {
+    document.getElementById('budgetMin').value = '';
+    document.getElementById('budgetMax').value = '';
+    document.getElementById('deadlineRange').value = '';
+    
+    filteredTenders = [...allTenders];
+    document.getElementById('resultsCount').textContent = 
+        `Showing all ${allTenders.length} tenders`;
+    
+    renderTenders(filteredTenders);
+}
+
+// Add utility function to check if a date is valid
+function isValidDate(dateString) {
+    const date = new Date(dateString);
+    return !isNaN(date.getTime());
+}
+
+// Remove the automatic search on page load
+document.addEventListener('DOMContentLoaded', () => {
+    // Just show empty state initially
+    const resultsCount = document.getElementById('resultsCount');
+    resultsCount.textContent = 'Enter keywords to search for tenders';
+});
+</script>
+</body>
+</html>
