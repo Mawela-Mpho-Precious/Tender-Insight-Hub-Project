@@ -1,10 +1,13 @@
 from fastapi import FastAPI, Depends, Request
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from app.database import get_db, Base, engine
 from contextlib import asynccontextmanager
 import time
 import os
+from app.routes import company, auth, tenders
+from fastapi.middleware.cors import CORSMiddleware
 
 # Create database tables
 @asynccontextmanager
@@ -21,15 +24,25 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
-
+# Add CORS middleware here
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8000", "http://127.0.0.1:8000", "http://localhost:8001", "http://127.0.0.1:8001"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Include routers
-from app.routes import tenders, company
 app.include_router(tenders.router)
 app.include_router(company.router)
+app.include_router(auth.router)
+
+# Mount static files directory
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # Read the HTML template
 def read_html_template():
-    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'index.html')
+    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'base.html')
     with open(template_path, 'r', encoding='utf-8') as f:
         return f.read()
 
@@ -114,6 +127,8 @@ async def debug_search_test(keywords: str = "construction"):
             "error": str(e),
             "search_keywords": keywords
         }
+
+    
 @app.get("/api/debug/available-tenders")
 async def debug_available_tenders(limit: int = 20):
     """
@@ -155,6 +170,41 @@ async def debug_available_tenders(limit: int = 20):
             "success": False,
             "error": str(e)
         }
+
+# Serve partial templates
+@app.get("/tender-search-partial", response_class=HTMLResponse)
+async def tender_search_partial():
+    """Serve the tender search form"""
+    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'partials', 'index.html')
+    with open(template_path, 'r', encoding='utf-8') as f:
+        return HTMLResponse(content=f.read())
+
+@app.get("/company-profile-partial", response_class=HTMLResponse)
+async def company_profile_partial():
+    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'partials', 'company.html')
+    with open(template_path, 'r', encoding='utf-8') as f:
+        return HTMLResponse(content=f.read())
+
+@app.get("/register-partial", response_class=HTMLResponse)
+async def register_partial():
+    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'partials', 'register.html')
+    with open(template_path, 'r', encoding='utf-8') as f:
+        return HTMLResponse(content=f.read())
+
+@app.get("/login-partial", response_class=HTMLResponse)
+async def login_partial():
+    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'partials', 'login.html')
+    with open(template_path, 'r', encoding='utf-8') as f:
+        return HTMLResponse(content=f.read())
+
+# Main SPA route
+@app.get("/app", response_class=HTMLResponse)
+async def serve_spa():
+    """Serve the main SPA"""
+    with open("app/templates/base.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+
 
 if __name__ == "__main__":
     import uvicorn
