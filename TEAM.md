@@ -1,0 +1,58 @@
+# Team Leadership Log
+
+## Week 1 Team Lead Report
+**Lead:** Mawela Mpho Precious  
+**Responsibilities:** Initial project setup, repo structure, Git setup  
+**Decisions Made:** Chose FastAPI, defined team roles
+
+## Week 2 Team Lead Report  
+**Lead:** Mawela Mpho Precious  
+
+### Responsibilities / Decisions Made
+This week, we successfully implemented data extraction from the **Tender Insight Keyword Search, Filtering & Match Ranking** feature. Key achievements include:
+
+- Users can enter free-text keywords (e.g., “road construction”, “security services”) into a search bar.  
+- The backend performs a search on tender descriptions retrieved from the **OCDS eTenders API**.  
+- Search results can be filtered by:  
+  - Province  
+  - Buyer (organ of state)  
+- Users apply filters after receiving the initial search results to narrow down the tenders.  
+- Once filters are applied, users can view the tenders that match their criteria.  
+
+### Key Decisions Made
+- We decided to divide parts of the work among team members to improve efficiency and ensure each feature could be developed in parallel.  
+
+### Challenges Faced and Solutions
+- Initially, the API was not extracting data correctly, which blocked progress. After troubleshooting, we resolved the issue, and the API is now fully functional.  
+- Filtering by **submission deadline window** and **budget range** was not possible at first. While full filtering is still under refinement, we implemented partial filters (province and buyer) to ensure progress.  
+
+### Reflections on Teamwork and Leadership
+- Dividing tasks allowed the team to work efficiently and made collaboration smoother.  
+- Leading the team taught me the importance of clear communication and quickly addressing blockers to keep progress on track.  
+- Working through the API issues together reinforced the value of persistence and problem-solving in a team setting.  
+
+## Week 3 Team Lead Report
+**Lead:** Kelebogile Dlamini
+
+### Responsibilities / Decisions Made
+This week, our focus was on the **Company Profile Management** feature.
+
+- Worked on the Company Profile schema and discussed its required fields
+- Decided that each team member should attempt to work on the Company Profile individually and present their solution during the next meeting to move forward.  
+- Completed the AI summarization feature
+
+### Key Decision Made
+- Adopted a collaborative approach to Company Profile development by having all team members contribute individually.
+
+### Challenges Faced and Solutions
+- The Company Profile feature is still incomplete, which slowed progress. To solve this, everyone will work on their own version and merge ideas next week.  
+
+### Reflections on Teamwork and Leadership
+- Having all members contribute to the Company Profile feature encourages creativity and will help us find the best approach.  
+
+
+
+
+
+
+
