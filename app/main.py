@@ -1,19 +1,44 @@
-from fastapi import FastAPI, Depends, Request
+from fastapi import FastAPI, Depends, Request, UploadFile, File
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+from app.mongodb import mongodb 
 from app.database import get_db, Base, engine
 from contextlib import asynccontextmanager
 import time
 import os
+import shutil
+
+from fastapi.middleware.cors import CORSMiddleware
+
+# Import existing routers
+from app.routes import company, auth, tenders, tender_summarize, workspace
+
+# Import summarization services
+from app.services.tender_doc_services import (
+    extract_text_from_pdf,
+    extract_text_from_zip,
+    summarize_text,
+    highlight_key_points
+)
+
 
 # Create database tables
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create tables on startup
-    print("Creating database tables...")
+    # Create SQL tables on startup
+    print("Creating SQL database tables...")
     Base.metadata.create_all(bind=engine)
-    print("Database tables created successfully!")
+    print("SQL database tables created successfully!")
+    
+    # Initialize MongoDB
+    print("Initializing MongoDB...")
+    await mongodb.connect()
+    
     yield
+    
+    # Cleanup on shutdown
+    await mongodb.close()
 
 app = FastAPI(
     title="Tender Insight Hub API",
@@ -22,14 +47,51 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "http://localhost:8001",
+        "http://127.0.0.1:8001"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup"""
+    print("🚀 Starting Tender Insight Hub...")
+    # Connect to MongoDB
+    await mongodb.connect()
+    print("✅ All services initialized")
+
+# Shutdown event
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanup on shutdown"""
+    await mongodb.close()
+    print("👋 Services shut down")
+
 # Include routers
-from app.routes import tenders, company
 app.include_router(tenders.router)
 app.include_router(company.router)
+app.include_router(auth.router)
+app.include_router(tender_summarize.router) 
+app.include_router(
+    workspace.router, 
+    prefix="/api/workspace", 
+    tags=["workspace"]
+)
+
+# Mount static files directory
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # Read the HTML template
 def read_html_template():
-    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'index.html')
+    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'base.html')
     with open(template_path, 'r', encoding='utf-8') as f:
         return f.read()
 
@@ -45,24 +107,24 @@ async def root():
             "api_docs": "/docs",
             "health": "/health",
             "tenders": "/api/tenders/search",
-            "company": "/api/company/profile"
+            "company": "/api/company/profile",
+            "summarize_tender": "/api/tenders/summarize"
         }
     }
 
 @app.get("/health")
 async def health_check(db: Session = Depends(get_db)):
     try:
-        # Test database connection
         db.execute("SELECT 1")
         return {
-            "status": "healthy", 
+            "status": "healthy",
             "database": "connected",
             "timestamp": time.time()
         }
     except Exception as e:
         return {
-            "status": "unhealthy", 
-            "database": "disconnected", 
+            "status": "unhealthy",
+            "database": "disconnected",
             "error": str(e),
             "timestamp": time.time()
         }
@@ -82,25 +144,17 @@ async def serve_ui():
 
 @app.get("/api/debug/search-test")
 async def debug_search_test(keywords: str = "construction"):
-    """
-    Debug endpoint to test client-side search
-    """
     from app.services.ocds_service import ocds_service
-    
     try:
-        # Get results with client-side filtering
         results = ocds_service.search_tenders(keywords)
-        
-        # Extract useful info for debugging
         tender_info = []
-        for result in results[:5]:  # First 5 results
+        for result in results[:5]:
             tender = result.get('tender', {})
             tender_info.append({
                 "title": tender.get('title', 'No title'),
                 "description": tender.get('description', '')[:100] + "..." if tender.get('description') else 'No description',
                 "buyer": tender.get('procuringEntity', {}).get('name', 'Unknown'),
             })
-        
         return {
             "success": True,
             "search_keywords": keywords,
@@ -114,28 +168,21 @@ async def debug_search_test(keywords: str = "construction"):
             "error": str(e),
             "search_keywords": keywords
         }
+
 @app.get("/api/debug/available-tenders")
 async def debug_available_tenders(limit: int = 20):
-    """
-    Debug endpoint to see what tenders are actually available from API
-    """
     from app.services.ocds_service import ocds_service
-    
     try:
-        # Get all tenders without filtering
         all_tenders = ocds_service.search_tenders("")
-        
-        # Extract useful information about what's available
         tender_samples = []
         for tender in all_tenders[:limit]:
             tender_data = tender.get('tender', {})
             items = []
-            for item in tender_data.get('items', [])[:3]:  # First 3 items
+            for item in tender_data.get('items', [])[:3]:
                 items.append({
                     "description": item.get('description', ''),
                     "classification": item.get('classification', {}).get('description', '')
                 })
-            
             tender_samples.append({
                 "title": tender_data.get('title', 'No title'),
                 "description": tender_data.get('description', '')[:100] + "..." if tender_data.get('description') else 'No description',
@@ -143,7 +190,6 @@ async def debug_available_tenders(limit: int = 20):
                 "value": tender_data.get('value', {}).get('amount', 0),
                 "items": items
             })
-        
         return {
             "success": True,
             "total_available": len(all_tenders),
@@ -155,6 +201,42 @@ async def debug_available_tenders(limit: int = 20):
             "success": False,
             "error": str(e)
         }
+
+# Serve partial templates
+@app.get("/tender-search-partial", response_class=HTMLResponse)
+async def tender_search_partial():
+    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'partials', 'index.html')
+    with open(template_path, 'r', encoding='utf-8') as f:
+        return HTMLResponse(content=f.read())
+
+@app.get("/company-profile-partial", response_class=HTMLResponse)
+async def company_profile_partial():
+    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'partials', 'company.html')
+    with open(template_path, 'r', encoding='utf-8') as f:
+        return HTMLResponse(content=f.read())
+
+@app.get("/register-partial", response_class=HTMLResponse)
+async def register_partial():
+    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'partials', 'register.html')
+    with open(template_path, 'r', encoding='utf-8') as f:
+        return HTMLResponse(content=f.read())
+
+@app.get("/login-partial", response_class=HTMLResponse)
+async def login_partial():
+    template_path = os.path.join(os.path.dirname(__file__), 'templates', 'partials', 'login.html')
+    with open(template_path, 'r', encoding='utf-8') as f:
+        return HTMLResponse(content=f.read())
+
+# Main SPA route
+@app.get("/app", response_class=HTMLResponse)
+async def serve_spa():
+    with open("app/templates/base.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+# ---------------------------
+# Tender Document Summarization Endpoint (direct integration as optional)
+# ---------------------------
+
 
 if __name__ == "__main__":
     import uvicorn

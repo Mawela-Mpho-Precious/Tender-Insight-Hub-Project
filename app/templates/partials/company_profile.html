@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Profile - Tender Insight Hub</title>
+    <style>
+        /* Reuse your existing styles from index.html */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); overflow: hidden; }
+        header { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 30px; text-align: center; }
+        
+        .form-section { padding: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #3498db; }
+        button { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        button:hover { transform: translateY(-2px); }
+        .section-title { margin: 30px 0 20px 0; padding-bottom: 10px; border-bottom: 2px solid #e9ecef; color: #2c3e50; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏢 Company Profile</h1>
+            <p>Create or update your company profile to enhance tender matching</p>
+        </header>
+
+        <section class="form-section">
+            <form id="companyProfileForm">
+                <h2 class="section-title">Company Information</h2>
+                
+                <div class="form-group">
+                    <label for="companyName">Company Name *</label>
+                    <input type="text" id="companyName" name="companyName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registrationNumber">Registration Number (CIPC)</label>
+                    <input type="text" id="registrationNumber" name="registrationNumber">
+                </div>
+
+                <div class="form-group">
+                    <label for="vatNumber">VAT Number</label>
+                    <input type="text" id="vatNumber" name="vatNumber">
+                </div>
+
+                <h2 class="section-title">Business Details</h2>
+                
+                <div class="form-group">
+                    <label for="industrySector">Industry Sector *</label>
+                    <select id="industrySector" name="industrySector" required>
+                        <option value="">Select Industry Sector</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="servicesProvided">Services Provided *</label>
+                    <textarea id="servicesProvided" name="servicesProvided" rows="3" placeholder="e.g., Construction, IT Services, Security" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="yearsExperience">Years of Experience</label>
+                    <input type="number" id="yearsExperience" name="yearsExperience" min="0" value="0">
+                </div>
+
+                <h2 class="section-title">Certifications</h2>
+                
+                <div class="form-group">
+                    <label for="cidbGrading">CIDB Grading</label>
+                    <select id="cidbGrading" name="cidbGrading">
+                        <option value="">Select CIDB Grade</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bbbeeLevel">BBBEE Level</label>
+                    <select id="bbbeeLevel" name="bbbeeLevel">
+                        <option value="">Select BBBEE Level</option>
+                    </select>
+                </div>
+
+                <h2 class="section-title">Geographic Coverage</h2>
+                
+                <div class="form-group">
+                    <label for="operatingProvinces">Operating Provinces</label>
+                    <select id="operatingProvinces" name="operatingProvinces" multiple size="4">
+                        <option value="">Select Provinces (multiple)</option>
+                    </select>
+                </div>
+
+                <h2 class="section-title">Contact Information</h2>
+                
+                <div class="form-group">
+                    <label for="contactEmail">Contact Email</label>
+                    <input type="email" id="contactEmail" name="contactEmail">
+                </div>
+
+                <div class="form-group">
+                    <label for="contactPhone">Contact Phone</label>
+                    <input type="tel" id="contactPhone" name="contactPhone">
+                </div>
+
+                <div class="form-group">
+                    <label for="physicalAddress">Physical Address</label>
+                    <textarea id="physicalAddress" name="physicalAddress" rows="3"></textarea>
+                </div>
+
+                <button type="submit">Save Company Profile</button>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        
+        // Load dropdown options
+        async function loadFormOptions() {
+            try {
+                // Load industries
+                const industriesResponse = await fetch(`${API_BASE}/company/options/industries`);
+                const industriesData = await industriesResponse.json();
+                const industrySelect = document.getElementById('industrySector');
+                
+                industriesData.industries.forEach(industry => {
+                    const option = document.createElement('option');
+                    option.value = industry;
+                    option.textContent = industry;
+                    industrySelect.appendChild(option);
+                });
+
+                // Load provinces
+                const provincesResponse = await fetch(`${API_BASE}/company/options/provinces`);
+                const provincesData = await provincesResponse.json();
+                const provinceSelect = document.getElementById('operatingProvinces');
+                
+                provincesData.provinces.forEach(province => {
+                    const option = document.createElement('option');
+                    option.value = province;
+                    option.textContent = province;
+                    provinceSelect.appendChild(option);
+                });
+
+                // Load certifications
+                const certsResponse = await fetch(`${API_BASE}/company/options/certifications`);
+                const certsData = await certsResponse.json();
+                
+                // Populate CIDB grades
+                const cidbSelect = document.getElementById('cidbGrading');
+                certsData.certifications.cidb.forEach(grade => {
+                    const option = document.createElement('option');
+                    option.value = grade;
+                    option.textContent = grade;
+                    cidbSelect.appendChild(option);
+                });
+
+                // Populate BBBEE levels
+                const bbbeeSelect = document.getElementById('bbbeeLevel');
+                certsData.certifications.bbbee.forEach(level => {
+                    const option = document.createElement('option');
+                    option.value = level;
+                    option.textContent = level;
+                    bbbeeSelect.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error('Error loading form options:', error);
+            }
+        }
+
+        // Handle form submission
+       // Handle form submission
+document.getElementById('companyProfileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Show loading state
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.textContent = 'Saving...';
+    submitButton.disabled = true;
+    
+    try {
+        // First, let's create a team if none exists
+        let teamId = 1;
+        
+        try {
+            const teamsResponse = await fetch(`${API_BASE}/company/teams`);
+            const teams = await teamsResponse.json();
+            
+            if (teams.length === 0) {
+                const createTeamResponse = await fetch(`${API_BASE}/company/teams`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: 'Default Team' })
+                });
+                const newTeam = await createTeamResponse.json();
+                teamId = newTeam.id;
+            } else {
+                teamId = teams[0].id;
+            }
+        } catch (teamError) {
+            console.warn('Team creation failed, using default team ID 1');
+        }
+
+        const formData = {
+            company_name: document.getElementById('companyName').value,
+            registration_number: document.getElementById('registrationNumber').value || null,
+            vat_number: document.getElementById('vatNumber').value || null,
+            industry_sector: document.getElementById('industrySector').value,
+            services_provided: document.getElementById('servicesProvided').value,
+            years_of_experience: parseInt(document.getElementById('yearsExperience').value) || 0,
+            cidb_grading: document.getElementById('cidbGrading').value || null,
+            bbbee_level: document.getElementById('bbbeeLevel').value || null,
+            operating_provinces: Array.from(document.getElementById('operatingProvinces').selectedOptions)
+                .map(option => option.value)
+                .filter(value => value)
+                .join(',') || null,
+            contact_email: document.getElementById('contactEmail').value || null,
+            contact_phone: document.getElementById('contactPhone').value || null,
+            physical_address: document.getElementById('physicalAddress').value || null,
+            number_of_employees: 0,
+            annual_turnover: null,
+            team_id: teamId
+        };
+
+        console.log('Submitting form data:', formData);
+
+        const response = await fetch(`${API_BASE}/company/profiles`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        const responseData = await response.json();
+        console.log('Server response:', responseData);
+
+        if (response.ok) {
+            alert('✅ Company profile saved successfully!');
+            window.location.href = '/ui';
+        } else {
+            // Properly handle error response
+            const errorMessage = responseData.detail || 
+                                responseData.message || 
+                                JSON.stringify(responseData) || 
+                                'Unknown error occurred';
+            alert(`❌ Error: ${errorMessage}`);
+        }
+        
+    } catch (error) {
+        console.error('Network error:', error);
+        alert('❌ Network error: Failed to connect to server. Please check if the server is running.');
+    } finally {
+        // Restore button state
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+    }
+});
+        // Load options when page loads
+        document.addEventListener('DOMContentLoaded', loadFormOptions);
+    </script>
+</body>
+</html>

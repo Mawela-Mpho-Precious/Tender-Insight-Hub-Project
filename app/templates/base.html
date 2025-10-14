@@ -1,0 +1,5471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tender Insight Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin: 5px 0;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #27ae60;
+        }
+
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-left-color: #27ae60;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            min-height: 400px;
+        }
+
+        /* Auth State */
+        .auth-state {
+            padding: 20px;
+            text-align: right;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .auth-state button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .auth-state button:hover {
+            background: #c0392b;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        /* Search Styles */
+        .search-section {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .results-section {
+            padding: 30px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .results-count {
+            font-size: 1.2em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .tenders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .tender-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .tender-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .tender-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .tender-details {
+            color: #6c757d;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .tender-details div {
+            margin-bottom: 5px;
+        }
+
+        .tender-budget {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #27ae60;
+            margin: 10px 0;
+        }
+
+        .tender-deadline {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+
+        .error {
+            background: #ffe6e6;
+            color: #c0392b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #c0392b;
+        }
+
+        .filters {
+            margin-top: 20px;
+            border-top: 2px solid #e9ecef;
+            padding-top: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 10px 0;
+            }
+            
+            .nav-links {
+                display: flex;
+                overflow-x: auto;
+            }
+            
+            .nav-links li {
+                margin: 0 5px;
+            }
+            
+            .nav-links a {
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                padding: 10px 15px;
+                white-space: nowrap;
+            }
+            
+            .nav-links a.active {
+                border-left: none;
+                border-bottom-color: #27ae60;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .form-group {
+                min-width: 100%;
+            }
+            
+            .tenders-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Add to your existing CSS */
+        .document-section {
+            transition: all 0.3s ease;
+        }
+
+        .document-section:hover {
+            background: #e9ecef !important;
+        }
+
+        .ai-summary-section {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ai-summary-btn:hover {
+            background: #2980b9 !important;
+            transform: translateY(-1px);
+        }
+
+        .match-tender-btn:hover {
+            background: #219a52 !important;
+            transform: translateY(-1px);
+        }
+
+        /* Workspace Styles */
+.workspace-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.workspace-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.workspace-header h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.workspace-header p {
+    color: #7f8c8d;
+    font-size: 1.1em;
+}
+
+.status-filters {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.status-filter {
+    padding: 10px 20px;
+    border: 2px solid #bdc3c7;
+    background: white;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.status-filter.active {
+    background: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+.status-filter:hover {
+    border-color: #3498db;
+}
+
+.workspace-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-left: 4px solid #3498db;
+}
+
+.stat-number {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #7f8c8d;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.workspace-tenders {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.workspace-tender-card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-left: 4px solid #3498db;
+}
+
+.tender-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.tender-title {
+    color: #2c3e50;
+    margin: 0;
+    flex: 1;
+    margin-right: 20px;
+}
+
+.tender-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.match-score {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.score-high { background: #d4edda; color: #155724; }
+.score-medium { background: #fff3cd; color: #856404; }
+.score-low { background: #f8d7da; color: #721c24; }
+.score-very-low { background: #e2e3e5; color: #383d41; }
+
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 15px;
+    color: white;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.status-pending { background: #f39c12; }
+.status-interested { background: #3498db; }
+.status-not_eligible { background: #e74c3c; }
+.status-submitted { background: #9b59b6; }
+.status-won { background: #27ae60; }
+.status-lost { background: #7f8c8d; }
+
+.tender-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.detail-value {
+    color: #7f8c8d;
+}
+
+.ai-summary {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border-left: 3px solid #3498db;
+}
+
+.ai-summary strong {
+    color: #2c3e50;
+}
+
+.tender-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ecf0f1;
+}
+
+.status-select {
+    padding: 8px 12px;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    background: white;
+    cursor: pointer;
+}
+
+.tender-notes {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.empty-workspace {
+    text-align: center;
+    padding: 60px 20px;
+    color: #7f8c8d;
+}
+
+.empty-workspace h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .workspace-container {
+        padding: 10px;
+    }
+    
+    .tender-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .tender-meta {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .tender-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .status-select {
+        width: 100%;
+    }
+}
+
+        .match-badge.score-high { background: #27ae60; color: white; }
+        .match-badge.score-medium { background: #f39c12; color: white; }
+        .match-badge.score-low { background: #e74c3c; color: white; }
+        .match-badge.score-very-low { background: #95a5a6; color: white; }
+
+        .ai-summary-content p {
+            margin: 0 0 10px 0;
+            line-height: 1.5;
+            color: #2c3e50;
+        }
+
+        .recommendation {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+            font-size: 0.9em;
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            min-width: 300px;
+        }
+
+        .notification-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .notification-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .notification-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* SaaS Plan Styles */
+        .feature-disabled {
+            opacity: 0.6;
+            cursor: not-allowed !important;
+            pointer-events: none;
+        }
+        
+        .plan-restricted {
+            position: relative;
+        }
+        
+        .plan-restricted::after {
+            content: "🔒 Plan Restricted";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 10;
+        }
+        
+        .upgrade-prompt {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .search-limit-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #856404;
+        }
+        
+        .search-limit-display {
+            text-align: center;
+            padding: 5px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .plan-option {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            background: white;
+        }
+        
+        .plan-option.recommended {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    
+.tender-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border: 1px solid #e1e5e9;
+    transition: all 0.3s ease;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.tender-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
+.tender-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.tender-title {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.4em;
+    font-weight: 600;
+    line-height: 1.4;
+    flex: 1;
+    min-width: 300px;
+    word-wrap: break-word;
+}
+
+.tender-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.budget-badge, .deadline-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.budget-badge {
+    background: #e8f5e8;
+    color: #27ae60;
+    border: 1px solid #d4edda;
+}
+
+.deadline-badge {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.tender-details {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #495057;
+    min-width: 90px;
+    font-size: 0.95em;
+    flex-shrink: 0;
+}
+
+.detail-value {
+    color: #6c757d;
+    font-size: 0.95em;
+    word-break: break-word;
+}
+
+/* FIXED: Better desktop layout for tender actions */
+.tender-actions {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.documents-section {
+    background: #f8f9fa;
+    padding: 24px;
+    border-radius: 10px;
+    height: fit-content;
+}
+
+.ai-actions-section {
+    background: #f8f9fa;
+    padding: 24px;
+    border-radius: 10px;
+    height: fit-content;
+    min-width: 280px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.section-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.15em;
+    font-weight: 600;
+}
+
+.section-icon {
+    font-size: 1.3em;
+}
+
+.document-count {
+    background: #e9ecef;
+    color: #6c757d;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.85em;
+    margin-left: auto;
+}
+
+.documents-list {
+    max-height: 220px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    padding-right: 8px;
+}
+
+/* Scrollbar styling */
+.documents-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.documents-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.documents-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.documents-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+.document-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e9ecef;
+    gap: 16px;
+}
+
+.document-item:last-child {
+    border-bottom: none;
+}
+
+.document-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.document-icon {
+    font-size: 1.2em;
+    flex-shrink: 0;
+}
+
+.document-title {
+    font-size: 0.95em;
+    color: #495057;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.4;
+    flex: 1;
+    word-break: normal;
+    hyphens: auto;
+}
+
+.download-btn {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 120px;
+}
+
+.download-btn:hover:not(.disabled) {
+    background: #219653;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+.download-btn.disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.more-documents {
+    text-align: center;
+    font-size: 0.9em;
+    color: #6c757d;
+    padding: 12px;
+    background: #e9ecef;
+    border-radius: 6px;
+    margin-top: 8px;
+}
+
+.no-documents {
+    text-align: center;
+    color: #6c757d;
+    padding: 30px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 0.95em;
+}
+
+.no-docs-icon {
+    display: block;
+    font-size: 2.5em;
+    margin-bottom: 12px;
+    opacity: 0.7;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-align: left;
+    width: 100%;
+    min-height: 54px;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.summary-btn {
+    background: #3498db;
+    color: white;
+}
+
+.summary-btn:hover {
+    background: #2980b9;
+}
+
+.match-btn {
+    background: #27ae60;
+    color: white;
+}
+
+.match-btn:hover {
+    background: #219653;
+}
+
+.save-btn {
+    background: #9b59b6;
+    color: white;
+}
+
+.save-btn:hover {
+    background: #8e44ad;
+}
+
+.btn-icon {
+    font-size: 1.2em;
+    flex-shrink: 0;
+}
+
+.ai-summary-section {
+    display: none;
+    margin-top: 24px;
+    padding: 24px;
+    background: #e8f4fd;
+    border-radius: 10px;
+    border-left: 4px solid #3498db;
+}
+
+.no-results {
+    text-align: center;
+    padding: 80px 40px;
+    color: #6c757d;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin: 20px 0;
+}
+
+.no-results-icon {
+    font-size: 4.5em;
+    margin-bottom: 24px;
+    opacity: 0.5;
+}
+
+.no-results-text {
+    font-size: 1.2em;
+    font-weight: 500;
+}
+
+/* Improved responsive design */
+@media (max-width: 1024px) {
+    .tender-actions {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .ai-actions-section {
+        max-width: 100%;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .tender-card {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .tender-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .tender-title {
+        min-width: 100%;
+        font-size: 1.3em;
+    }
+    
+    .tender-meta {
+        justify-content: flex-start;
+        width: 100%;
+    }
+    
+    .tender-details {
+        grid-template-columns: 1fr;
+        padding: 16px;
+        gap: 10px;
+    }
+    
+    .documents-section, .ai-actions-section {
+        padding: 20px;
+    }
+    
+    .document-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 0;
+    }
+    
+    .download-btn {
+        align-self: stretch;
+        min-width: auto;
+        margin-left: 0;
+    }
+    
+    .document-title {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .action-buttons {
+        gap: 12px;
+    }
+    
+    .action-btn {
+        padding: 12px 16px;
+        min-height: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tender-card {
+        padding: 16px;
+        border-radius: 10px;
+    }
+    
+    .tender-title {
+        font-size: 1.2em;
+    }
+    
+    .budget-badge, .deadline-badge {
+        padding: 6px 12px;
+        font-size: 0.85em;
+    }
+    
+    .documents-section, .ai-actions-section {
+        padding: 16px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .document-count {
+        margin-left: 0;
+        align-self: flex-start;
+    }
+    
+    .document-title {
+        font-size: 0.9em;
+        line-height: 1.3;
+    }
+}
+.workspace-tender-card {
+    background: white;
+    padding: 20px;
+    margin: 10px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.tender-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.status-badge {
+    background: #3498db;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+}
+
+.tender-details {
+    margin: 10px 0;
+}
+
+.tender-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-primary { background: #3498db; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; }
+.btn-secondary { background: #95a5a6; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; }
+.btn-danger { background: #e74c3c; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; }
+
+.status-filters { display: flex; gap: 10px; margin: 15px 0; }
+.status-filter { padding: 8px 15px; border: 1px solid #ddd; background: white; border-radius: 5px; cursor: pointer; }
+.status-filter.active { background: #3498db; color: white; }
+/* Improved Tender Card Layout */
+.tender-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tender-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.tender-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f8f9fa;
+}
+
+.tender-title {
+    color: #2c3e50;
+    margin: 0;
+    flex: 1;
+    margin-right: 20px;
+    font-size: 1.4em;
+    line-height: 1.3;
+    font-weight: 600;
+}
+
+.tender-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    min-width: 200px;
+}
+
+.budget-badge {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+.deadline-badge {
+    background: linear-gradient(135deg, #e74c3c, #e67e22);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+.tender-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 120px;
+}
+
+.detail-value {
+    color: #6c757d;
+    text-align: right;
+    flex: 1;
+}
+
+/* Documents Section */
+.documents-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #3498db;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.section-icon {
+    font-size: 1.3em;
+}
+
+.section-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    flex: 1;
+}
+
+.document-count {
+    background: #3498db;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.documents-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.document-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+}
+
+.document-item:hover {
+    border-color: #3498db;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+}
+
+.document-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.document-icon {
+    font-size: 1.2em;
+}
+
+.document-title {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.download-btn {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.download-btn:hover:not(.disabled) {
+    background: #219a52;
+}
+
+.download-btn.disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
+
+.more-documents {
+    text-align: center;
+    padding: 10px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.no-documents {
+    text-align: center;
+    padding: 30px;
+    color: #6c757d;
+    background: white;
+    border-radius: 8px;
+    border: 2px dashed #bdc3c7;
+}
+
+.no-docs-icon {
+    font-size: 2em;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* AI Actions Section */
+.ai-actions-section {
+    margin-top: 25px;
+    padding: 25px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+}
+
+.ai-actions-section .section-header {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.ai-actions-section .section-header h4 {
+    color: white;
+    font-size: 1.3em;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 180px;
+}
+
+.action-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.action-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.summary-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border: none;
+}
+
+.match-btn {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+    border: none;
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #27ae60, #219a52);
+    border: none;
+}
+
+.btn-icon {
+    font-size: 1.1em;
+}
+
+/* AI Summary Section */
+.ai-summary-section {
+    margin-top: 25px;
+    padding: 0;
+    background: transparent;
+}
+
+.summary-content {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+}
+
+/* Match Results Styling */
+.match-score-display {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.match-score-value {
+    font-size: 3em;
+    font-weight: 700;
+    margin: 10px 0;
+}
+
+.match-score-label {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tender-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .tender-meta {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .tender-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        min-width: auto;
+        justify-content: center;
+    }
+    
+    .document-item {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .document-info {
+        justify-content: center;
+    }
+}
+.notes-section {
+    border-top: 1px solid #eee;
+    margin-top: 15px;
+    padding-top: 15px;
+}
+
+.notes-section h4 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.notes-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.note-item {
+    background: #f8f9fa;
+    border-left: 4px solid #007bff;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.note-item.task-note {
+    border-left-color: #28a745;
+    background: #f0fff4;
+}
+
+.note-content {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.task-info {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85em;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.task-status.completed {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.task-status.pending {
+    color: #ffc107;
+    font-weight: bold;
+}
+
+.note-meta {
+    font-size: 0.8em;
+    color: #999;
+    text-align: right;
+}
+
+.add-note-form {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.add-note-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.note-actions {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+}
+
+.task-fields {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.task-fields input {
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.no-notes {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
+.error-message {
+    background: #fff3f3;
+    border: 1px solid #ffcdd2;
+    border-radius: 4px;
+    padding: 15px;
+    text-align: center;
+    color: #d32f2f;
+    margin-bottom: 15px;
+}
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>🔍 Tender Insight Hub</h1>
+                <p>Navigate your tenders</p>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="#home" class="nav-link" data-page="home">🏠 Home</a></li>
+                <li><a href="#tenders" class="nav-link" data-page="tenders">📋 Search Tenders</a></li>
+                <li><a href="#workspace" class="nav-link" data-page="workspace">🏢 Workspace</a></li>
+                <li><a href="#company-profile" class="nav-link" data-page="company-profile">🏢 Company Profile</a></li>
+                <li><a href="#register" class="nav-link" data-page="register">👥 Register</a></li>
+                <li><a href="#login" class="nav-link" data-page="login">🔐 Login</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="content-container">
+                <!-- Auth State Display -->
+                <div class="auth-state" id="authState">
+                    <span id="userInfo">Not logged in</span>
+                    <button id="logoutBtn" style="display: none;">Logout</button>
+                </div>
+
+                <!-- Dynamic Content Container -->
+                <div class="page-content" id="pageContent">
+                    <div class="loading">
+                        <div>Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // API Configuration
+const API_BASE = window.location.origin;
+let currentUser = null;
+let allTenders = [];
+let filteredTenders = [];
+
+// SaaS Plan Management System
+const PlanManager = {
+    // Plan definitions
+    PLANS: {
+        FREE: 'free',
+        BASIC: 'basic', 
+        PRO: 'pro'
+    },
+
+    // Plan features configuration
+    PLAN_FEATURES: {
+        free: {
+            name: 'Free',
+            max_users: 1,
+            weekly_searches: 3,
+            features: {
+                ai_summary: false,
+                export_reports: false,
+                matched_tender: false,
+                unlimited_searches: false
+            },
+            price: 0
+        },
+        basic: {
+            name: 'Basic', 
+            max_users: 3,
+            weekly_searches: -1, // unlimited
+            features: {
+                ai_summary: true,
+                export_reports: false,
+                matched_tender: true,
+                unlimited_searches: true
+            },
+            price: 49
+        },
+        pro: {
+            name: 'Pro',
+            max_users: -1, // unlimited
+            weekly_searches: -1, // unlimited
+            features: {
+                ai_summary: true,
+                export_reports: true,
+                matched_tender: true,
+                unlimited_searches: true
+            },
+            price: 99
+        }
+    },
+
+    // Current team/plan state
+    currentTeam: null,
+    currentUser: null,
+
+    // Initialize plan system
+    async init() {
+        await this.loadTeamData();
+        this.updateUIForPlan();
+        this.attachPlanEventListeners();
+    },
+
+    // Get user-specific localStorage key
+    getUserTeamKey() {
+        const userEmail = localStorage.getItem(AuthManager.USER_EMAIL_KEY);
+        return userEmail ? `current_team_${userEmail}` : 'current_team_anonymous';
+    },
+
+    // Get user-specific search usage key
+    getUserSearchUsageKey() {
+        const userEmail = localStorage.getItem(AuthManager.USER_EMAIL_KEY);
+        return userEmail ? `search_usage_${userEmail}` : 'search_usage_anonymous';
+    },
+
+    // Load team data from localStorage (demo version) - FIXED: User-scoped
+    async loadTeamData() {
+        try {
+            if (!AuthManager.isAuthenticated()) {
+                return;
+            }
+
+            // Use user-scoped key for team data
+            const userTeamKey = this.getUserTeamKey();
+            const storedTeam = localStorage.getItem(userTeamKey);
+            
+            if (storedTeam) {
+                this.currentTeam = JSON.parse(storedTeam);
+                console.log('✅ Team data loaded for user:', userTeamKey, this.currentTeam);
+                return;
+            }
+
+            // Default to free plan if no stored data
+            this.currentTeam = { plan: this.PLANS.FREE, user_count: 1 };
+            console.log('✅ Defaulting to free plan for new user');
+            
+        } catch (error) {
+            console.error('Error loading team data:', error);
+            // Default to free plan on error
+            this.currentTeam = { plan: this.PLANS.FREE, user_count: 1 };
+        }
+    },
+
+    // Get current plan
+    getCurrentPlan() {
+        return this.currentTeam?.plan || this.PLANS.FREE;
+    },
+
+    // Get plan details
+    getPlanDetails(planName = null) {
+        const plan = planName || this.getCurrentPlan();
+        return this.PLAN_FEATURES[plan] || this.PLAN_FEATURES.free;
+    },
+
+    // Check if feature is available
+    hasFeature(featureName) {
+        const planDetails = this.getPlanDetails();
+        return planDetails.features[featureName] === true;
+    },
+
+    // Check if user can perform search (weekly limit)
+    canPerformSearch() {
+        const planDetails = this.getPlanDetails();
+        
+        if (planDetails.weekly_searches === -1) {
+            return true; // Unlimited searches
+        }
+
+        const searchesThisWeek = this.getWeeklySearchCount();
+        return searchesThisWeek < planDetails.weekly_searches;
+    },
+
+    // Get weekly search count - FIXED: User-scoped
+    getWeeklySearchCount() {
+        const userSearchUsageKey = this.getUserSearchUsageKey();
+        const searchData = JSON.parse(localStorage.getItem(userSearchUsageKey) || '{}');
+        const currentWeek = this.getCurrentWeek();
+        return searchData[currentWeek] || 0;
+    },
+
+    // Record search usage - FIXED: User-scoped
+    recordSearch() {
+        const planDetails = this.getPlanDetails();
+        
+        if (planDetails.weekly_searches === -1) {
+            return; // No need to track for unlimited plans
+        }
+
+        const userSearchUsageKey = this.getUserSearchUsageKey();
+        const searchData = JSON.parse(localStorage.getItem(userSearchUsageKey) || '{}');
+        const currentWeek = this.getCurrentWeek();
+        
+        if (!searchData[currentWeek]) {
+            searchData[currentWeek] = 0;
+        }
+        
+        searchData[currentWeek]++;
+        localStorage.setItem(userSearchUsageKey, JSON.stringify(searchData));
+    },
+
+    // Get current week identifier
+    getCurrentWeek() {
+        const now = new Date();
+        const startOfYear = new Date(now.getFullYear(), 0, 1);
+        const days = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000));
+        return Math.ceil(days / 7);
+    },
+
+    // Check if team can add more users
+    canAddUser() {
+        const planDetails = this.getPlanDetails();
+        
+        if (planDetails.max_users === -1) {
+            return true; // Unlimited users
+        }
+
+        return (this.currentTeam?.user_count || 0) < planDetails.max_users;
+    },
+
+    // Apply plan restrictions to UI
+    updateUIForPlan() {
+        const currentPlan = this.getCurrentPlan();
+        const planDetails = this.getPlanDetails();
+        
+        console.log(`🎯 Applying plan restrictions for: ${currentPlan}`);
+
+        // Update plan indicator in UI
+        this.updatePlanIndicator(currentPlan, planDetails);
+
+        // Apply feature restrictions
+        this.applyFeatureRestrictions(planDetails);
+
+        // Update search limits display
+        this.updateSearchLimitsDisplay(planDetails);
+    },
+
+    // Update plan indicator in UI
+    updatePlanIndicator(plan, planDetails) {
+        let planIndicator = document.getElementById('planIndicator');
+        
+        if (!planIndicator) {
+            planIndicator = document.createElement('div');
+            planIndicator.id = 'planIndicator';
+            planIndicator.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                background: #3498db;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 12px;
+                z-index: 1000;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            `;
+            document.body.appendChild(planIndicator);
+        }
+
+        planIndicator.textContent = `${planDetails.name} Plan`;
+        planIndicator.style.background = 
+            plan === this.PLANS.PRO ? '#27ae60' : 
+            plan === this.PLANS.BASIC ? '#3498db' : '#95a5a6';
+    },
+
+    // Apply feature restrictions based on plan
+    applyFeatureRestrictions(planDetails) {
+        // AI Summary restrictions
+        if (!planDetails.features.ai_summary) {
+            this.disableFeature('ai-summary', 'Upgrade to Basic plan for AI Summaries');
+        }
+
+        // Export restrictions
+        if (!planDetails.features.export_reports) {
+            this.disableFeature('export-reports', 'Upgrade to Pro plan for PDF Export');
+        }
+
+        // Matched Tender restrictions
+        if (!planDetails.features.matched_tender) {
+            this.disableFeature('matched-tender', 'Upgrade to Basic plan for Tender Matching');
+        }
+
+        // Search limit warnings
+        if (!planDetails.features.unlimited_searches) {
+            this.addSearchLimitWarning();
+        }
+    },
+
+    // Disable a specific feature
+    disableFeature(featureClass, upgradeMessage) {
+        const elements = document.querySelectorAll(`.${featureClass}`);
+        elements.forEach(element => {
+            element.style.opacity = '0.6';
+            element.style.cursor = 'not-allowed';
+            element.title = upgradeMessage;
+            
+            // Replace click handler
+            const originalOnClick = element.onclick;
+            element.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.showUpgradeModal(upgradeMessage);
+                return false;
+            };
+
+            // For buttons, also disable them
+            if (element.tagName === 'BUTTON') {
+                element.disabled = true;
+            }
+        });
+    },
+
+    // Add search limit warning
+    addSearchLimitWarning() {
+        const searchForms = document.querySelectorAll('#searchForm');
+        searchForms.forEach(form => {
+            const existingWarning = form.querySelector('.search-limit-warning');
+            if (!existingWarning) {
+                const warning = document.createElement('div');
+                warning.className = 'search-limit-warning';
+                warning.innerHTML = `
+                    <strong>Free Plan:</strong> ${this.getWeeklySearchCount()} of 3 weekly searches used. 
+                    <a href="#" onclick="PlanManager.showUpgradeModal('Upgrade to Basic plan for unlimited searches')" style="color: #3498db;">Upgrade for unlimited searches</a>
+                `;
+                form.parentNode.insertBefore(warning, form);
+            }
+        });
+    },
+
+    // Update search limits display
+    updateSearchLimitsDisplay(planDetails) {
+        if (planDetails.weekly_searches !== -1) {
+            const searchesUsed = this.getWeeklySearchCount();
+            const searchesLeft = planDetails.weekly_searches - searchesUsed;
+            
+            const limitDisplay = document.createElement('div');
+            limitDisplay.className = 'search-limit-display';
+            limitDisplay.textContent = `Searches this week: ${searchesUsed}/${planDetails.weekly_searches}`;
+            
+            // Add to search forms
+            document.querySelectorAll('#searchForm').forEach(form => {
+                const existing = form.querySelector('.search-limit-display');
+                if (existing) existing.remove();
+                form.parentNode.insertBefore(limitDisplay.cloneNode(true), form);
+            });
+        }
+    },
+
+    // Show upgrade modal
+    showUpgradeModal(featureDescription) {
+        const currentPlan = this.getCurrentPlan();
+        const upgradeOptions = this.getUpgradeOptions(currentPlan);
+        
+        const modalHTML = `
+            <div class="upgrade-modal" style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            ">
+                <div style="
+                    background: white;
+                    padding: 30px;
+                    border-radius: 10px;
+                    max-width: 500px;
+                    width: 90%;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                ">
+                    <h2 style="color: #2c3e50; margin-bottom: 15px;">✨ Upgrade Required</h2>
+                    <p style="color: #6c757d; margin-bottom: 20px;">${featureDescription}</p>
+                    
+                    <div class="plan-comparison" style="margin: 20px 0;">
+                        ${upgradeOptions.map(plan => `
+                            <div class="plan-option ${plan.recommended ? 'recommended' : ''}" style="
+                                border: 2px solid ${plan.recommended ? '#3498db' : '#e9ecef'};
+                                border-radius: 10px;
+                                padding: 20px;
+                                margin: 10px 0;
+                                background: ${plan.recommended ? '#f8f9fa' : 'white'};
+                            ">
+                                <h3 style="color: #2c3e50; margin-bottom: 10px;">
+                                    ${plan.name} ${plan.recommended ? '⭐' : ''}
+                                </h3>
+                                <div style="font-size: 1.5em; color: #27ae60; margin-bottom: 10px;">
+                                    $${plan.price}/month
+                                </div>
+                                <ul style="color: #6c757d; margin-bottom: 15px; padding-left: 20px;">
+                                    ${plan.features.map(feature => `
+                                        <li>${feature}</li>
+                                    `).join('')}
+                                </ul>
+                                <button onclick="PlanManager.upgradeToPlan('${plan.id}')" 
+                                        style="
+                                            background: ${plan.recommended ? '#27ae60' : '#3498db'};
+                                            color: white;
+                                            border: none;
+                                            padding: 10px 20px;
+                                            border-radius: 5px;
+                                            cursor: pointer;
+                                            width: 100%;
+                                        ">
+                                    ${plan.id === currentPlan ? 'Current Plan' : 'Upgrade to ' + plan.name}
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="this.closest('.upgrade-modal').remove()" 
+                            style="
+                                background: #95a5a6;
+                                color: white;
+                                border: none;
+                                padding: 10px 20px;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                width: 100%;
+                                margin-top: 10px;
+                            ">
+                        Maybe Later
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Remove existing modal
+        document.querySelectorAll('.upgrade-modal').forEach(modal => modal.remove());
+        
+        // Add new modal
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+    },
+
+    // Get upgrade options based on current plan
+    getUpgradeOptions(currentPlan) {
+        const allPlans = [
+            {
+                id: this.PLANS.FREE,
+                name: 'Free',
+                price: 0,
+                features: [
+                    '1 user per team',
+                    '3 searches per week',
+                    'Basic tender search',
+                    'No AI features'
+                ],
+                recommended: currentPlan === this.PLANS.FREE
+            },
+            {
+                id: this.PLANS.BASIC,
+                name: 'Basic', 
+                price: 49,
+                features: [
+                    'Up to 3 users',
+                    'Unlimited searches',
+                    'AI summaries',
+                    'Tender matching',
+                    'Readiness checks'
+                ],
+                recommended: currentPlan === this.PLANS.FREE
+            },
+            {
+                id: this.PLANS.PRO,
+                name: 'Pro',
+                price: 99,
+                features: [
+                    'Unlimited users',
+                    'All Basic features',
+                    'PDF export reports',
+                    'Advanced analytics',
+                    'Priority support'
+                ],
+                recommended: currentPlan === this.PLANS.BASIC || currentPlan === this.PLANS.FREE
+            }
+        ];
+
+        return allPlans.filter(plan => 
+            plan.id === currentPlan || 
+            (currentPlan === this.PLANS.FREE && plan.id !== this.PLANS.FREE) ||
+            (currentPlan === this.PLANS.BASIC && plan.id === this.PLANS.PRO)
+        );
+    },
+
+    // Upgrade to a new plan - DEMO VERSION (no API calls) - FIXED: User-scoped
+    async upgradeToPlan(planId) {
+        try {
+            console.log(`🔄 DEMO: Upgrading to plan: ${planId}`);
+            
+            if (!AuthManager.isAuthenticated()) {
+                alert('Please log in to upgrade your plan');
+                navigateTo('login');
+                return;
+            }
+
+            // Show processing state
+            showNotification('⏳ Processing upgrade...', 'info');
+            
+            // Simulate API call delay for realism (1 second)
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // DEMO: Update local state directly - no API call needed
+            if (this.currentTeam) {
+                this.currentTeam.plan = planId;
+            } else {
+                this.currentTeam = { plan: planId, user_count: 1 };
+            }
+            
+            // Save to USER-SCOPED localStorage
+            const userTeamKey = this.getUserTeamKey();
+            localStorage.setItem(userTeamKey, JSON.stringify(this.currentTeam));
+            
+            showNotification(`✅ Successfully upgraded to ${this.getPlanDetails(planId).name} plan!`, 'success');
+            
+            // Remove upgrade modal
+            document.querySelectorAll('.upgrade-modal').forEach(modal => modal.remove());
+            
+            // Update UI with new plan features
+            this.updateUIForPlan();
+            
+            console.log(`🎉 Demo upgrade complete! Now on ${planId} plan for user: ${userTeamKey}`);
+            
+        } catch (error) {
+            console.error('Upgrade error:', error);
+            showNotification('❌ Upgrade failed. Please try again.', 'error');
+        }
+    },
+
+    // Attach plan-related event listeners
+    attachPlanEventListeners() {
+        // Intercept search form submissions to check limits
+        document.addEventListener('submit', (e) => {
+            if (e.target.id === 'searchForm') {
+                if (!this.canPerformSearch()) {
+                    e.preventDefault();
+                    this.showUpgradeModal('You have reached your weekly search limit. Upgrade for unlimited searches.');
+                    return false;
+                }
+                this.recordSearch();
+            }
+        });
+
+        // Add plan checks to AI summary buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('ai-summary-btn') || e.target.closest('.ai-summary-btn')) {
+                if (!this.hasFeature('ai_summary')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showUpgradeModal('Upgrade to Basic plan for AI Summarization');
+                    return false;
+                }
+            }
+
+            // Check for matched tender feature
+            if (e.target.classList.contains('match-tender-btn') || e.target.closest('.match-tender-btn')) {
+                if (!this.hasFeature('matched_tender')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showUpgradeModal('Upgrade to Basic plan for Tender Matching');
+                    return false;
+                }
+            }
+
+            // Check for export feature
+            if (e.target.classList.contains('export-btn') || e.target.closest('.export-btn')) {
+                if (!this.hasFeature('export_reports')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showUpgradeModal('Upgrade to Pro plan for PDF Export');
+                    return false;
+                }
+            }
+        });
+    },
+
+    // Team management functions
+    async getTeamMembers() {
+        try {
+            const response = await fetch(`${API_BASE}/api/team/members`, {
+                headers: AuthManager.getAuthHeaders()
+            });
+
+            if (response.ok) {
+                return await response.json();
+            }
+        } catch (error) {
+            console.error('Error fetching team members:', error);
+        }
+        return [];
+    },
+
+    async inviteUser(email) {
+        if (!this.canAddUser()) {
+            showNotification('❌ User limit reached. Upgrade plan to add more team members.', 'error');
+            return false;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/api/team/invite`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...AuthManager.getAuthHeaders()
+                },
+                body: JSON.stringify({ email })
+            });
+
+            if (response.ok) {
+                showNotification('✅ Invitation sent successfully!', 'success');
+                return true;
+            } else {
+                throw new Error('Invitation failed');
+            }
+        } catch (error) {
+            showNotification('❌ Failed to send invitation', 'error');
+            return false;
+        }
+    },
+
+    // Usage statistics
+    getUsageStatistics() {
+        const planDetails = this.getPlanDetails();
+        const searchesUsed = this.getWeeklySearchCount();
+        
+        return {
+            plan: planDetails.name,
+            searches: {
+                used: searchesUsed,
+                limit: planDetails.weekly_searches,
+                remaining: planDetails.weekly_searches === -1 ? 'Unlimited' : planDetails.weekly_searches - searchesUsed
+            },
+            users: {
+                current: this.currentTeam?.user_count || 1,
+                limit: planDetails.max_users,
+                remaining: planDetails.max_users === -1 ? 'Unlimited' : planDetails.max_users - (this.currentTeam?.user_count || 1)
+            },
+            features: planDetails.features
+        };
+    },
+
+    // Display usage dashboard
+    showUsageDashboard() {
+        const usage = this.getUsageStatistics();
+        
+        const dashboardHTML = `
+            <div class="usage-dashboard" style="
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                margin: 20px 0;
+            ">
+                <h3 style="color: #2c3e50; margin-bottom: 20px;">📊 Usage Dashboard - ${usage.plan} Plan</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- Searches -->
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <h4 style="color: #2c3e50; margin-bottom: 10px;">🔍 Searches</h4>
+                        <div style="font-size: 1.5em; color: #3498db; margin-bottom: 5px;">
+                            ${usage.searches.used} / ${usage.searches.limit === -1 ? '∞' : usage.searches.limit}
+                        </div>
+                        <div style="color: #6c757d; font-size: 0.9em;">
+                            ${usage.searches.remaining === 'Unlimited' ? 'Unlimited searches remaining' : `${usage.searches.remaining} searches remaining this week`}
+                        </div>
+                    </div>
+                    
+                    <!-- Team Members -->
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <h4 style="color: #2c3e50; margin-bottom: 10px;">👥 Team Members</h4>
+                        <div style="font-size: 1.5em; color: #9b59b6; margin-bottom: 5px;">
+                            ${usage.users.current} / ${usage.users.limit === -1 ? '∞' : usage.users.limit}
+                        </div>
+                        <div style="color: #6c757d; font-size: 0.9em;">
+                            ${usage.users.remaining === 'Unlimited' ? 'Unlimited seats available' : `${usage.users.remaining} seats available`}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Features -->
+                <div style="margin-top: 20px;">
+                    <h4 style="color: #2c3e50; margin-bottom: 10px;">✨ Features</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        ${Object.entries(usage.features).map(([feature, enabled]) => `
+                            <div style="display: flex; align-items: center; padding: 8px; background: ${enabled ? '#d4edda' : '#f8d7da'}; border-radius: 5px;">
+                                <span style="margin-right: 8px;">${enabled ? '✅' : '❌'}</span>
+                                <span style="color: #2c3e50; text-transform: capitalize;">${feature.replace('_', ' ')}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                ${usage.plan !== 'Pro' ? `
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button onclick="PlanManager.showUpgradeModal('Get access to all features and higher limits')" 
+                                style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                            🚀 Upgrade Plan
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        
+        return dashboardHTML;
+    }
+};
+
+// Auth functions
+const AuthManager = {
+    // Token storage key (use consistent key)
+    TOKEN_KEY: 'auth_token',
+    USER_EMAIL_KEY: 'user_email',
+    USER_PROFILE_KEY: 'user_profile',
+  
+    setUserProfile(profile) {
+        localStorage.setItem(this.USER_PROFILE_KEY, JSON.stringify(profile));
+    },
+    
+    getUserProfile() {
+        const profile = localStorage.getItem(this.USER_PROFILE_KEY);
+        return profile ? JSON.parse(profile) : null;
+    },
+    
+    hasCompanyProfile() {
+        const profile = this.getUserProfile();
+        return profile ? profile.has_company_profile : false;
+    },
+    
+    // Get auth token
+    getToken() {
+        return localStorage.getItem(this.TOKEN_KEY);
+    },
+    
+    // Set auth token
+    setToken(token) {
+        localStorage.setItem(this.TOKEN_KEY, token);
+        this.updateUI();
+    },
+    
+    // Remove auth token (logout) - FIXED: Clear user-specific data
+    removeToken() {
+        const userEmail = localStorage.getItem(this.USER_EMAIL_KEY);
+        
+        // Clear user-specific plan data
+        if (userEmail) {
+            localStorage.removeItem(`current_team_${userEmail}`);
+            localStorage.removeItem(`search_usage_${userEmail}`);
+        }
+        
+        localStorage.removeItem(this.TOKEN_KEY);
+        localStorage.removeItem(this.USER_EMAIL_KEY);
+        this.updateUI();
+    },
+    
+    removeUserProfile() {
+        localStorage.removeItem(this.USER_PROFILE_KEY);
+    },
+    
+    removeUserEmail() {
+        localStorage.removeItem(this.USER_EMAIL_KEY);
+    },
+    
+    clearAll() {
+        this.removeToken();
+        this.removeUserProfile();
+        this.removeUserEmail();
+    },
+    
+    isAuthenticated() {
+        return !!this.getToken();
+    },
+    
+    updateAuthUI() {
+        const isAuthenticated = this.isAuthenticated();
+        const userProfile = this.getUserProfile();
+        
+        // Update login/logout buttons
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userInfo = document.getElementById('userInfo');
+        
+        if (loginBtn) loginBtn.style.display = isAuthenticated ? 'none' : 'block';
+        if (logoutBtn) logoutBtn.style.display = isAuthenticated ? 'block' : 'none';
+        
+        // Update user info if available
+        if (userInfo && userProfile) {
+            userInfo.textContent = userProfile.email || 'User';
+            userInfo.style.display = 'block';
+        }
+    },
+    
+    // Check if user is authenticated
+    isAuthenticated() {
+        return !!this.getToken();
+    },
+    
+    // Get auth headers for API calls
+    getAuthHeaders() {
+        const token = this.getToken();
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+        
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        return headers;
+    },
+    
+    // Get current user info
+    async getCurrentUser() {
+        const token = this.getToken();
+        if (!token) return null;
+        
+        try {
+            const response = await fetch(`${API_BASE}/auth/me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (response.ok) {
+                return await response.json();
+            } else {
+                this.removeToken();
+                return null;
+            }
+        } catch (error) {
+            console.error('Error getting current user:', error);
+            this.removeToken();
+            return null;
+        }
+    },
+    
+    // Update UI based on auth status
+    async updateUI() {
+        const token = this.getToken();
+        const userEmail = localStorage.getItem(this.USER_EMAIL_KEY);
+        
+        // Update the userInfo element if it exists
+        const userInfo = document.getElementById('userInfo');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        if (userInfo) {
+            if (token) {
+                // Try to get fresh user data
+                const user = await this.getCurrentUser();
+                if (user) {
+                    userInfo.textContent = `Logged in as: ${user.email}`;
+                    localStorage.setItem(this.USER_EMAIL_KEY, user.email);
+                } else if (userEmail) {
+                    userInfo.textContent = `Logged in as: ${userEmail}`;
+                } else {
+                    userInfo.textContent = 'Logged in';
+                }
+            } else {
+                userInfo.textContent = 'Not logged in';
+            }
+        }
+        
+        // Update logout button
+        if (logoutBtn) {
+            logoutBtn.style.display = token ? 'inline-block' : 'none';
+        }
+        
+        // Update navigation auth status
+        const authElements = document.querySelectorAll('.auth-status');
+        authElements.forEach(element => {
+            if (token) {
+                const displayEmail = userEmail || 'User';
+                element.innerHTML = `👤 ${displayEmail} | <a href="#" onclick="AuthManager.logout()" style="color: #e74c3c;">Logout</a>`;
+            } else {
+                element.innerHTML = '<a href="#login" onclick="navigateTo(\'login\')">Login</a>';
+            }
+        });
+        
+        // Show/hide protected features
+        const protectedElements = document.querySelectorAll('.protected-feature');
+        protectedElements.forEach(element => {
+            element.style.display = token ? 'block' : 'none';
+        });
+        
+        // Initialize plan manager if authenticated
+        if (token) {
+            await PlanManager.init();
+        }
+    },
+    
+    // Logout function - FIXED: Clear user-specific data
+    logout() {
+        this.removeToken();
+        alert('Logged out successfully');
+        navigateTo('home');
+    },
+    
+    // Validate token
+    async validateToken() {
+        const token = this.getToken();
+        if (!token) return false;
+        
+        try {
+            const response = await fetch(`${API_BASE}/auth/me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return response.ok;
+        } catch (error) {
+            console.error('Token validation error:', error);
+            return false;
+        }
+    },
+    
+    // Initialize auth system
+    init() {
+        this.updateUI();
+    }
+};
+
+// Page templates
+const pageTemplates = {
+    home: `
+        <div style="padding: 40px; text-align: center;">
+            <h1 style="color: #2c3e50; margin-bottom: 20px;">Welcome to Tender Insight Hub</h1>
+            <p style="color: #6c757d; font-size: 1.1em; margin-bottom: 30px;">
+                Find, analyze, and manage public procurement opportunities for South African SMEs
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 40px;">
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 2em; margin-bottom: 10px;">🔍</div>
+                    <h3>Search Tenders</h3>
+                    <p>Find relevant procurement opportunities</p>
+                    <button onclick="navigateTo('tenders')" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                        Start Searching
+                    </button>
+                </div>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 2em; margin-bottom: 10px;">🏢</div>
+                    <h3>Company Profile</h3>
+                    <p>Set up your business profile</p>
+                    <button onclick="navigateTo('company-profile')" style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                        Setup Profile
+                    </button>
+                </div>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 2em; margin-bottom: 10px;">📂</div>
+                    <h3>Workspace</h3>
+                    <p>Manage your tender pipeline</p>
+                    <button onclick="navigateTo('workspace')" style="background: #9b59b6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                        View Workspace
+                    </button>
+                </div>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 2em; margin-bottom: 10px;">📊</div>
+                    <h3>Plan & Usage</h3>
+                    <p>View your plan details and usage</p>
+                    <button onclick="showUsageDashboard()" style="background: #f39c12; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                        View Usage
+                    </button>
+                </div>
+            </div>
+        </div>
+    `,
+    tenders: `
+        <div style="padding: 20px;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">🔍 Search Tenders</h2>
+            <!-- Tender search form will be loaded here -->
+        </div>
+    `,
+    workspace: `
+        <div style="padding: 20px;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">📂 Workspace</h2>
+            <!-- Workspace content will be loaded here -->
+        </div>
+    `,
+    'company-profile': `
+        <div style="padding: 20px;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">🏢 Company Profile</h2>
+            <!-- Company profile form will be loaded here -->
+        </div>
+    `,
+    register: `
+        <div style="padding: 20px;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">👥 Register</h2>
+            <!-- Registration form will be loaded here -->
+        </div>
+    `,
+    login: `
+        <div style="padding: 20px;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">🔐 Login</h2>
+            <!-- Login form will be loaded here -->
+        </div>
+    `
+};
+
+// Navigation functions
+function navigateTo(page) {
+    console.log(`🔄 Navigating to: ${page}`);
+    
+    // Update URL hash
+    window.location.hash = page;
+    
+    // Update active nav link
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    const activeLink = document.querySelector(`[data-page="${page}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    }
+    
+    // Load page content
+    const pageContent = document.getElementById('pageContent');
+    if (pageContent && pageTemplates[page]) {
+        pageContent.innerHTML = pageTemplates[page];
+        console.log(`✅ Loaded template for: ${page}`);
+    } else {
+        console.error(`❌ No template found for: ${page}`);
+        return;
+    }
+    
+    // Initialize page-specific functionality with delay to ensure DOM is ready
+    setTimeout(() => {
+        console.log(`🚀 Initializing page: ${page}`);
+        initializePage(page);
+    }, 100);
+}
+
+// Enhanced page initialization
+function initializePage(page) {
+    switch(page) {
+        case 'tenders':
+            console.log('🔍 Initializing tender search...');
+            initializeTenderSearch();
+            break;
+        case 'workspace':
+            console.log('📂 Initializing workspace...');
+            initializeWorkspace();
+            break;
+        case 'company-profile':
+            console.log('🏢 Initializing company profile...');
+            // Check authentication before initializing company profile
+            if (!AuthManager.isAuthenticated()) {
+                console.log('🔒 User not authenticated, redirecting to login');
+                showAuthRequiredMessage();
+                return;
+            }
+            initializeCompanyProfile();
+            break;
+        case 'register':
+            console.log('👥 Initializing registration...');
+            initializeRegistration();
+            break;
+        case 'login':
+            console.log('🔐 Initializing login...');
+            initializeLogin();
+            break;
+        case 'home':
+            console.log('🏠 Home page loaded');
+            // Home page doesn't need additional initialization
+            break;
+        default:
+            console.warn(`⚠️ No initialization found for page: ${page}`);
+    }
+    
+    // Always update auth UI after page change
+    AuthManager.updateUI();
+}
+
+// Add this function to show authentication required message
+function showAuthRequiredMessage() {
+    const pageContent = document.getElementById('pageContent');
+    pageContent.innerHTML = `
+        <div style="padding: 40px; text-align: center;">
+            <div style="font-size: 2em; margin-bottom: 20px;">🔒</div>
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">Authentication Required</h2>
+            <p style="color: #6c757d; margin-bottom: 30px;">Please log in to access this page.</p>
+            <button onclick="navigateTo('login')" style="background: #3498db; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 5px;">
+                Login
+            </button>
+            <button onclick="navigateTo('register')" style="background: #95a5a6; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 5px;">
+                Register
+            </button>
+        </div>
+    `;
+}
+
+// Initialize functions for each page
+function initializeTenderSearch() {
+    console.log("Initializing tender search...");
+    
+    // Create search form dynamically
+    const searchFormHTML = `
+        <div class="search-section">
+            <form class="search-form" id="searchForm">
+                <div class="form-group">
+                    <label for="keywords">Search Keywords</label>
+                    <input 
+                        type="text" 
+                        id="keywords" 
+                        placeholder="e.g., construction, security services, IT"
+                        value="construction"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="province">Province (Optional)</label>
+                    <select id="province">
+                        <option value="">All Provinces</option>
+                        <option value="Eastern Cape">Eastern Cape</option>
+                        <option value="Free State">Free State</option>
+                        <option value="Gauteng">Gauteng</option>
+                        <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                        <option value="Limpopo">Limpopo</option>
+                        <option value="Mpumalanga">Mpumalanga</option>
+                        <option value="Northern Cape">Northern Cape</option>
+                        <option value="North West">North West</option>
+                        <option value="Western Cape">Western Cape</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="buyer">Buyer Organization (Optional)</label>
+                    <input 
+                        type="text" 
+                        id="buyer" 
+                        placeholder="e.g., Department of Transport"
+                    >
+                </div>
+
+                <button type="submit" class="search-btn">Search Tenders</button>
+            </form>
+            <div class="filters" id="filtersSection" style="display: none;">
+                <h3 style="margin: 20px 0 15px 0; color: #2c3e50;">Filter Results</h3>
+                
+                <div class="search-form" style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                    <div class="form-group">
+                        <label for="budgetMin">Budget Range (ZAR)</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="number" id="budgetMin" placeholder="Min" style="flex: 1;">
+                            <span>to</span>
+                            <input type="number" id="budgetMax" placeholder="Max" style="flex: 1;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deadlineRange">Submission Deadline</label>
+                        <select id="deadlineRange">
+                            <option value="">Any time</option>
+                            <option value="7">Next 7 days</option>
+                            <option value="30">Next 30 days</option>
+                            <option value="90">Next 90 days</option>
+                            <option value="expired">Past deadlines</option>
+                        </select>
+                    </div>
+
+                    <button type="button" onclick="applyFilters()" style="background: #3498db;">
+                        Apply Filters
+                    </button>
+                    <button type="button" onclick="clearFilters()" style="background: #e74c3c; margin-left: 10px;">
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="results-section">
+            <div class="results-header">
+                <div class="results-count" id="resultsCount">Enter keywords to search for tenders</div>
+            </div>
+            
+            <div id="loading" class="loading" style="display: none;">
+                <div>Searching for tenders...</div>
+            </div>
+            
+            <div id="error" class="error" style="display: none;"></div>
+            
+            <div class="tenders-grid" id="tendersGrid">
+                <!-- Tender cards will be inserted here -->
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('pageContent').innerHTML = searchFormHTML;
+    
+    // Add event listener for search form
+    document.getElementById('searchForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const keywords = document.getElementById('keywords').value.trim();
+        const province = document.getElementById('province').value;
+        const buyer = document.getElementById('buyer').value.trim();
+        
+        if (!keywords) {
+            showError('Please enter some keywords to search');
+            return;
+        }
+        
+        await searchTenders(keywords, province, buyer);
+    });
+}
+
+function showError(message) {
+    const errorDiv = document.getElementById('error');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    setTimeout(() => {
+        errorDiv.style.display = 'none';
+    }, 5000);
+}
+
+function showLoading(show) {
+    document.getElementById('loading').style.display = show ? 'block' : 'none';
+}
+
+function formatCurrency(amount) {
+    if (!amount) return 'Not specified';
+    return new Intl.NumberFormat('en-ZA', {
+        style: 'currency',
+        currency: 'ZAR'
+    }).format(amount);
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'Not specified';
+    try {
+        return new Date(dateString).toLocaleDateString('en-ZA', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    } catch (e) {
+        return dateString;
+    }
+}
+
+// Modified searchTenders function with plan restrictions
+async function searchTenders(keywords, province, buyer) {
+    // KEEP THIS: Check plan restrictions for free users
+    if (!PlanManager.canPerformSearch()) {
+        PlanManager.showUpgradeModal('You have reached your weekly search limit. Upgrade for unlimited searches.');
+        return;
+    }
+    
+    showLoading(true);
+    const errorDiv = document.getElementById('error');
+    errorDiv.style.display = 'none';
+    
+    try {
+        // Build query parameters
+        const params = new URLSearchParams();
+        params.append('keywords', keywords);
+        if (province) params.append('province', province);
+        if (buyer) params.append('buyer', buyer);
+        
+        const response = await fetch(`${API_BASE}/api/tenders/search?${params}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        displayResults(data);
+        
+        // KEEP THIS: Record the search for free plan tracking
+        PlanManager.recordSearch();
+        
+    } catch (error) {
+        console.error('Search error:', error);
+        showError('Failed to search tenders. Please check if the API server is running.');
+    } finally {
+        showLoading(false);
+    }
+}
+
+function displayResults(data) {
+    const resultsGrid = document.getElementById('tendersGrid');
+    const resultsCount = document.getElementById('resultsCount');
+    
+    resultsGrid.innerHTML = '';
+    
+    if (data.results && data.results.length > 0) {
+        // Store all tenders for filtering
+        allTenders = data.results;
+        filteredTenders = [...allTenders];
+        
+        resultsCount.textContent = `Found ${data.count} tenders for "${data.search_term}"`;
+        
+        // Show filters section
+        document.getElementById('filtersSection').style.display = 'block';
+        
+        // Display all results initially
+        renderTenders(allTenders);
+        
+    } else {
+        allTenders = [];
+        filteredTenders = [];
+        document.getElementById('filtersSection').style.display = 'none';
+        
+        if (data.error) {
+            resultsCount.textContent = 'API Error: Could not fetch tenders';
+            resultsGrid.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #e74c3c;">
+                    <div style="font-size: 3em; margin-bottom: 10px;">⚠️</div>
+                    <div>Error connecting to eTenders API</div>
+                </div>
+            `;
+        } else {
+            resultsCount.textContent = `No tenders found for "${data.search_term}"`;
+            resultsGrid.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #6c757d;">
+                    <div style="font-size: 3em; margin-bottom: 10px;">🔍</div>
+                    <div>No tenders match your search criteria</div>
+                </div>
+            `;
+        }
+    }
+}
+
+// Modified renderTenders function with plan restrictions
+// Modified renderTenders function with plan restrictions
+function renderTenders(tenders) {
+    const resultsGrid = document.getElementById('tendersGrid');
+    resultsGrid.innerHTML = '';
+    
+    if (tenders.length === 0) {
+        resultsGrid.innerHTML = `
+            <div class="no-results">
+                <div class="no-results-icon">🔍</div>
+                <div class="no-results-text">No tenders match your filter criteria</div>
+            </div>
+        `;
+        return;
+    }
+    
+    tenders.forEach(tender => {
+        const tenderCard = document.createElement('div');
+        tenderCard.className = 'tender-card';
+        
+        const amount = tender.value?.amount || 0;
+        const endDate = tender.tender?.tenderPeriod?.endDate;
+        const hasDocuments = tender.documents && Array.isArray(tender.documents) && tender.documents.length > 0;
+        const documentCount = hasDocuments ? tender.documents.length : 0;
+        
+        tenderCard.innerHTML = `
+            <!-- Tender Header -->
+            <div class="tender-header">
+                <h3 class="tender-title">${tender.title || 'No title'}</h3>
+                <div class="tender-meta">
+                    ${amount ? `<span class="budget-badge">${formatCurrency(amount)}</span>` : ''}
+                    ${endDate ? `<span class="deadline-badge">Due: ${formatDate(endDate)}</span>` : ''}
+                </div>
+            </div>
+            
+            <!-- Tender Details -->
+            <div class="tender-details">
+                <div class="detail-row">
+                    <span class="detail-label">Publisher:</span>
+                    <span class="detail-value">${tender.publisher?.name || 'Not specified'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Province:</span>
+                    <span class="detail-value">${tender.province || 'Not specified'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Buyer:</span>
+                    <span class="detail-value">${tender.buyer?.name || 'Not specified'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Tender ID:</span>
+                    <span class="detail-value">${tender.id || 'Not specified'}</span>
+                </div>
+            </div>
+            
+            <!-- Documents Section -->
+            <div class="documents-section">
+                <div class="section-header">
+                    <span class="section-icon">📄</span>
+                    <h4>Tender Documents</h4>
+                    <span class="document-count">${documentCount} available</span>
+                </div>
+                
+                ${hasDocuments ? `
+                    <div class="documents-list">
+                        ${tender.documents.slice(0, 3).map((doc, index) => {
+                            const docUrl = doc.url || '';
+                            const docTitle = doc.title || `Document ${index + 1}`;
+                            const canDownload = docUrl && docUrl.startsWith('http');
+                            
+                            return `
+                                <div class="document-item">
+                                    <div class="document-info">
+                                        <span class="document-icon">📎</span>
+                                        <span class="document-title">${docTitle}</span>
+                                    </div>
+                                    <button 
+                                        class="download-btn ${canDownload ? '' : 'disabled'}"
+                                        onclick="${canDownload ? `downloadDocument('${docUrl}', '${docTitle.replace(/'/g, "\\'")}')` : ''}"
+                                        ${!canDownload ? 'disabled' : ''}
+                                    >
+                                        ${canDownload ? '⬇️ Download' : '❌ No URL'}
+                                    </button>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    ${documentCount > 3 ? `
+                        <div class="more-documents">
+                            + ${documentCount - 3} more documents available
+                        </div>
+                    ` : ''}
+                ` : `
+                    <div class="no-documents">
+                        <span class="no-docs-icon">📭</span>
+                        <div>No documents available for this tender</div>
+                        <small>Check back later or contact the publishing office</small>
+                    </div>
+                `}
+            </div>
+            
+            <!-- AI Analysis Section -->
+            <div class="ai-actions-section">
+                <div class="section-header">
+                    <span class="section-icon">🤖</span>
+                    <h4>AI-Powered Analysis</h4>
+                </div>
+                
+                <div class="action-buttons" id="action-buttons-${tender.id}">
+                    <!-- Step 1: Start with Summarization -->
+                    <button class="action-btn summary-btn" onclick="startAISummarization('${tender.id}')">
+                        <span class="btn-icon">🤖</span>
+                        Start AI Analysis
+                    </button>
+                </div>
+                
+                <div style="margin-top: 15px; font-size: 0.9em; opacity: 0.9;">
+                    <strong>3-Step Process:</strong> 
+                    <span style="margin: 0 10px;">1. AI Summary</span> → 
+                    <span style="margin: 0 10px;">2. Tender Matching</span> → 
+                    <span style="margin: 0 10px;">3. Save Results</span>
+                </div>
+            </div>
+            
+            <!-- Results Section (initially hidden) -->
+            <div class="ai-summary-section" id="summary-${tender.id}" style="display: none;">
+                <div class="summary-content" id="summary-content-${tender.id}">
+                    <!-- AI Summary and Match Results will appear here -->
+                </div>
+            </div>
+        `;
+        
+        resultsGrid.appendChild(tenderCard);
+    });
+}
+// Sequential flow for AI analysis
+async function startAISummarization(tenderId) {
+        if (!PlanManager.hasFeature('ai_summary')) {
+        PlanManager.showUpgradeModal('Upgrade to Basic plan for AI Summarization');
+        return;
+    }
+    console.log(`🚀 Starting AI summarization for tender: ${tenderId}`);
+    
+    const actionButtons = document.getElementById(`action-buttons-${tenderId}`);
+    const summarySection = document.getElementById(`summary-${tenderId}`);
+    const summaryContent = document.getElementById(`summary-content-${tenderId}`);
+    
+    // Show loading state
+    actionButtons.innerHTML = `
+        <button class="action-btn summary-btn" disabled style="background: #95a5a6;">
+            <span class="btn-icon">⏳</span>
+            Generating Summary...
+        </button>
+    `;
+    
+    summarySection.style.display = 'block';
+    summaryContent.innerHTML = `
+        <div style="text-align: center; padding: 30px; color: #666;">
+            <div style="font-size: 2em; margin-bottom: 10px;">🤖</div>
+            <div>Generating AI summary...</div>
+            <div style="font-size: 0.9em; margin-top: 10px;">Analyzing tender requirements and key information</div>
+        </div>
+    `;
+    
+    try {
+        // Get tender data
+        const tender = allTenders.find(t => t.id === tenderId);
+        if (!tender) {
+            throw new Error('Tender not found in data');
+        }
+        
+        const title = tender.title || 'No title';
+        
+        // Build comprehensive text using ALL available data
+        let comprehensiveText = `
+            TENDER TITLE: ${title}.
+            
+            FULL DESCRIPTION: ${tender.description || 'No detailed description available'}.
+            
+            PUBLISHING ORGANIZATION: ${tender.publisher?.name || 'Not specified'}.
+            
+            BUYER/PROCURING ENTITY: ${tender.buyer?.name || 'Not specified'}.
+            
+            LOCATION/PROVINCE: ${tender.province || 'Location not specified'}.
+            
+            ESTIMATED BUDGET: ${tender.value?.amount ? `${formatCurrency(tender.value.amount)}` : 'Budget not specified'}.
+            
+            SUBMISSION DEADLINE: ${tender.tender?.tenderPeriod?.endDate ? formatDate(tender.tender.tenderPeriod.endDate) : 'Deadline not specified'}.
+        `;
+        
+        // Add document information if available
+        if (tender.documents && tender.documents.length > 0) {
+            comprehensiveText += `\n\nAVAILABLE DOCUMENTS: ${tender.documents.length} document(s) including ${tender.documents.map(doc => doc.title || 'document').join(', ')}.`;
+        }
+        
+        // Clean up the text
+        comprehensiveText = comprehensiveText.replace(/\s+/g, ' ').trim();
+        
+        console.log(`📝 Sending ${comprehensiveText.length} characters for summarization`);
+
+        // Use the summarize-from-data endpoint
+        const response = await fetch(`${API_BASE}/api/tenders/summarize-from-data`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tender_id: tenderId,
+                title: title,
+                description: comprehensiveText,
+                text_content: comprehensiveText
+            })
+        });
+
+        console.log('API Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log('AI Summarization result:', result);
+
+        if (result.error) {
+            throw new Error(result.error);
+        }
+
+        // Display the professional summary
+        displayProfessionalSummary(summaryContent, result);
+        
+        // Store summary for matching
+        sessionStorage.setItem(`summary_${tenderId}`, result.summary);
+        
+        // STEP 2: Show "Match This Tender" button after successful summarization
+        showMatchButton(tenderId, actionButtons);
+        
+        showNotification('✅ AI summary generated successfully!', 'success');
+
+    } catch (error) {
+        console.error('Error generating AI summary:', error);
+        
+        // Show error and reset to initial state
+        summaryContent.innerHTML = `
+            <div style="color: #e74c3c; text-align: center; background: #ffe6e6; padding: 20px; border-radius: 5px;">
+                <div style="font-size: 1.2em; margin-bottom: 10px;">❌ Failed to generate summary</div>
+                <div style="margin-bottom: 15px;">Error: ${error.message}</div>
+                <button onclick="startAISummarization('${tenderId}')" 
+                        style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    🔄 Try Again
+                </button>
+            </div>
+        `;
+        
+        // Reset to initial state
+        actionButtons.innerHTML = `
+            <button class="action-btn summary-btn" onclick="startAISummarization('${tenderId}')">
+                <span class="btn-icon">🤖</span>
+                AI Summarization
+            </button>
+        `;
+    }
+}
+
+function showMatchButton(tenderId, actionButtons) {
+    // STEP 2: Replace with Match button
+    actionButtons.innerHTML = `
+        <button class="action-btn match-btn" onclick="startTenderMatching('${tenderId}')">
+            <span class="btn-icon">🔍</span>
+            Match This Tender
+        </button>
+    `;
+}
+
+async function startTenderMatching(tenderId) {
+        if (!PlanManager.hasFeature('matched_tender')) {
+        PlanManager.showUpgradeModal('Upgrade to Basic plan for Tender Matching');
+        return;
+    }
+    console.log(`🔍 Starting tender matching for: ${tenderId}`);
+    
+    const actionButtons = document.getElementById(`action-buttons-${tenderId}`);
+    const summaryContent = document.getElementById(`summary-content-${tenderId}`);
+    
+    // Show loading state for matching
+    actionButtons.innerHTML = `
+        <button class="action-btn match-btn" disabled style="background: #95a5a6;">
+            <span class="btn-icon">⏳</span>
+            Matching Tender...
+        </button>
+    `;
+    
+    // Add matching indicator to summary section
+    const matchingIndicator = document.createElement('div');
+    matchingIndicator.innerHTML = `
+        <div style="text-align: center; padding: 20px; background: #fff3cd; border-radius: 5px; margin-top: 15px;">
+            <div style="font-weight: bold; color: #856404;">🔍 Matching tender with your company profile...</div>
+        </div>
+    `;
+    summaryContent.appendChild(matchingIndicator);
+    
+    try {
+        // Validate authentication
+        if (!AuthManager.isAuthenticated()) {
+            throw new Error('Please log in to use the matching feature.');
+        }
+
+        const isValid = await AuthManager.validateToken();
+        if (!isValid) {
+            AuthManager.removeToken();
+            throw new Error('Your session has expired. Please log in again.');
+        }
+
+        // Get the summary text from sessionStorage
+        let summaryText = sessionStorage.getItem(`summary_${tenderId}`);
+        
+        if (!summaryText) {
+            throw new Error('Please generate AI summary first');
+        }
+
+        console.log(`📝 Using summary text for matching (${summaryText.length} chars)`);
+
+        // Call the match API
+        const response = await fetch(`${API_BASE}/api/tenders/${tenderId}/match`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...AuthManager.getAuthHeaders()
+            },
+            body: JSON.stringify({
+                summary: summaryText,
+                tender_id: tenderId
+            })
+        });
+
+        console.log('📡 Match API response status:', response.status);
+
+        // Handle authentication errors
+        if (response.status === 401) {
+            AuthManager.removeToken();
+            throw new Error('Authentication failed. Please log in again.');
+        }
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Match failed: ${response.status} - ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log('✅ Match result:', result);
+
+        if (result.success) {
+            // Remove matching indicator
+            matchingIndicator.remove();
+            
+            // Display match results
+            displayMatchResults(summaryContent, result, tenderId);
+            
+            // STEP 3: Show "Save to Workspace" button after successful matching
+            showSaveButton(tenderId, actionButtons, result);
+            
+            showNotification('✅ Tender matching completed!', 'success');
+            
+        } else {
+            throw new Error(result.detail || result.error || 'Matching failed');
+        }
+
+    } catch (error) {
+        console.error('❌ Error matching tender:', error);
+        
+        // Remove matching indicator
+        matchingIndicator.remove();
+        
+        // Show error message
+        if (error.message.includes('log in') || error.message.includes('session') || error.message.includes('Authentication')) {
+            summaryContent.innerHTML += `
+                <div style="color: #e74c3c; margin-top: 15px; padding: 15px; background: #ffe6e6; border-radius: 5px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">🔐 Authentication Required</div>
+                    <div>${error.message}</div>
+                    <div style="margin-top: 10px;">
+                        <button onclick="handleAuthRedirect('${tenderId}')" 
+                                style="background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+                                Login Now
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else {
+            summaryContent.innerHTML += `
+                <div style="color: #e74c3c; margin-top: 15px; padding: 15px; background: #ffe6e6; border-radius: 5px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">❌ Failed to Match Tender</div>
+                    <div>Error: ${error.message}</div>
+                    <button onclick="startTenderMatching('${tenderId}')" 
+                            style="background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                        🔄 Retry Matching
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Go back to match button
+        showMatchButton(tenderId, actionButtons);
+    }
+}
+
+function showSaveButton(tenderId, actionButtons, matchResult) {
+    // STEP 3: Show Save button with match score
+    const score = matchResult.suitability_score || 0;
+    
+    actionButtons.innerHTML = `
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <div style="background: ${getScoreColor(score).background}; color: white; padding: 8px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9em;">
+                ${score}% Match
+            </div>
+            <button class="action-btn save-btn" onclick="saveTenderToWorkspace('${tenderId}', ${score})">
+                <span class="btn-icon">💾</span>
+                Save to Workspace
+            </button>
+        </div>
+    `;
+}
+
+// Update your save function to include match score
+
+
+
+function attachMatchButtonListeners() {
+    const matchButtons = document.querySelectorAll('.match-tender-btn');
+    matchButtons.forEach(button => {
+        // Remove any existing listeners to prevent duplicates
+        button.replaceWith(button.cloneNode(true));
+    });
+    
+    // Re-select and attach listeners
+    const newMatchButtons = document.querySelectorAll('.match-tender-btn');
+    newMatchButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const tenderId = this.getAttribute('data-tender-id');
+            matchTender(tenderId);
+        });
+    });
+    
+    console.log(`✅ Attached listeners to ${newMatchButtons.length} match buttons`);
+}
+
+// Download document function
+async function downloadDocument(url, filename) {
+    try {
+        console.log(`⬇ Downloading: ${filename} from ${url}`);
+        
+        if (!url) {
+            showNotification('❌ No download URL available', 'error');
+            return;
+        }
+        
+        showNotification(`Starting download: ${filename}`, 'info');
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename.endsWith('.pdf') ? filename : filename + '.pdf';
+        link.target = '_blank';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showNotification(`✅ Download started: ${filename}`, 'success');
+        
+    } catch (error) {
+        console.error('Download error:', error);
+        showNotification(`❌ Download failed: ${error.message}`, 'error');
+    }
+}
+
+// AI Summary function with plan restrictions
+async function generateAISummary(tenderId) {
+    // Check plan restrictions
+    if (!PlanManager.hasFeature('ai_summary')) {
+        PlanManager.showUpgradeModal('Upgrade to Basic plan for AI Summarization');
+        return;
+    }
+    
+    const summarySection = document.getElementById(`summary-${tenderId}`);
+    const summaryContent = document.getElementById(`summary-content-${tenderId}`);
+    
+    summarySection.style.display = 'block';
+    summaryContent.innerHTML = '<div style="text-align: center; padding: 20px;">🤖 Generating AI summary...</div>';
+    
+    try {
+        console.log(`Generating AI summary for tender: ${tenderId}`);
+        
+        // Get tender data directly from the array (more reliable)
+        const tender = allTenders.find(t => t.id === tenderId);
+        if (!tender) {
+            throw new Error('Tender not found in data');
+        }
+        
+        const title = tender.title || 'No title';
+        
+        // Build comprehensive text using ALL available data
+        let comprehensiveText = `
+            TENDER TITLE: ${title}.
+            
+            FULL DESCRIPTION: ${tender.description || 'No detailed description available'}.
+            
+            PUBLISHING ORGANIZATION: ${tender.publisher?.name || 'Not specified'}.
+            
+            BUYER/PROCURING ENTITY: ${tender.buyer?.name || 'Not specified'}.
+            
+            LOCATION/PROVINCE: ${tender.province || 'Location not specified'}.
+            
+            ESTIMATED BUDGET: ${tender.value?.amount ? `${formatCurrency(tender.value.amount)}` : 'Budget not specified'}.
+            
+            SUBMISSION DEADLINE: ${tender.tender?.tenderPeriod?.endDate ? formatDate(tender.tender.tenderPeriod.endDate) : 'Deadline not specified'}.
+            
+            TENDER CATEGORY: Public procurement opportunity for goods, services, or construction works.
+            
+            PROCESS: Competitive bidding process following public procurement regulations.
+            
+            REQUIREMENTS: Bidders must comply with specified technical specifications, submission deadlines, and evaluation criteria as detailed in tender documents.
+        `;
+        
+        // Add document information if available
+        if (tender.documents && tender.documents.length > 0) {
+            comprehensiveText += `\n\nAVAILABLE DOCUMENTS: ${tender.documents.length} document(s) including ${tender.documents.map(doc => doc.title || 'document').join(', ')}.`;
+        }
+        
+        // Clean up the text
+        comprehensiveText = comprehensiveText.replace(/\s+/g, ' ').trim();
+        
+        console.log(`📝 Comprehensive text length: ${comprehensiveText.length} characters`);
+        console.log(`📝 Text preview: ${comprehensiveText.substring(0, 300)}...`);
+
+        // Use the summarize-from-data endpoint
+        const response = await fetch(`${API_BASE}/api/tenders/summarize-from-data`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tender_id: tenderId,
+                title: title,
+                description: comprehensiveText,
+                text_content: comprehensiveText
+            })
+        });
+
+        console.log('API Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API Error response:', errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log('API Success response:', result);
+
+        if (result.error) {
+            throw new Error(result.error);
+        }
+
+        // Display the summary professionally
+        displayProfessionalSummary(summaryContent, result);
+
+    } catch (error) {
+        console.error('Error generating AI summary:', error);
+        summaryContent.innerHTML = `
+            <div style="color: #e74c3c; text-align: center; background: #ffe6e6; padding: 15px; border-radius: 5px;">
+                <div style="font-size: 1.2em; margin-bottom: 10px;">❌ Failed to generate summary</div>
+                <div style="font-size: 0.9em; margin-bottom: 10px;">Error: ${error.message}</div>
+                <button onclick="useDocumentSummary('${tenderId}')" style="background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin: 5px;">
+                    📄 Try Document-Based Summary
+                </button>
+            </div>
+        `;
+    }
+}
+function displayProfessionalSummary(container, result) {
+    container.innerHTML = `
+        <div style="margin-bottom: 25px;">
+            <h4 style="color: #2c3e50; margin-bottom: 15px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
+                📋 AI-Generated Summary
+            </h4>
+            <div style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); padding: 20px; border-radius: 10px; border-left: 4px solid #3498db;">
+                <p style="margin: 0; line-height: 1.7; color: #2c3e50; font-size: 1.05em;">
+                    ${result.summary}
+                </p>
+            </div>
+        </div>
+        
+        ${result.highlights && result.highlights.length > 0 ? `
+            <div style="margin-bottom: 25px;">
+                <h4 style="color: #2c3e50; margin-bottom: 15px; border-bottom: 2px solid #e67e22; padding-bottom: 10px;">
+                    🎯 Key Highlights
+                </h4>
+                <div style="display: grid; gap: 10px;">
+                    ${result.highlights.map((point, index) => `
+                        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e9ecef; border-left: 4px solid #e67e22;">
+                            <span style="background: #e67e22; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.8em; flex-shrink: 0;">
+                                ${index + 1}
+                            </span>
+                            <div style="color: #2c3e50; line-height: 1.5;">${point}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : ''}
+        
+        <div style="background: linear-gradient(135deg, #d4edda, #c3e6cb); padding: 20px; border-radius: 10px; text-align: center; border: 1px solid #c3e6cb;">
+            <div style="font-size: 1.2em; font-weight: 600; color: #155724; margin-bottom: 5px;">
+                ✅ AI Analysis Complete
+            </div>
+            <div style="color: #0f5132; font-size: 0.95em;">
+                Ready for tender matching with your company profile
+            </div>
+        </div>
+    `;
+}
+// Tender matching function with plan restrictions
+async function matchTender(tenderId) {
+    // Check plan restrictions
+    if (!PlanManager.hasFeature('matched_tender')) {
+        PlanManager.showUpgradeModal('Upgrade to Basic plan for Tender Matching');
+        return;
+    }
+    
+    console.log(`🔍 Starting match process for tender: ${tenderId}`);
+    
+    const summaryContent = document.getElementById(`summary-content-${tenderId}`);
+    const matchButton = document.querySelector(`.match-tender-btn[data-tender-id="${tenderId}"]`);
+    
+    if (!matchButton) {
+        console.error('❌ Match button not found for tender:', tenderId);
+        return;
+    }
+    
+    const originalText = matchButton.textContent;
+    matchButton.textContent = '🔍 Analyzing...';
+    matchButton.disabled = true;
+
+    try {
+        console.log('🔐 Checking authentication...');
+        
+        // Validate authentication
+        if (!AuthManager.isAuthenticated()) {
+            throw new Error('Please log in to use this feature.');
+        }
+
+        const isValid = await AuthManager.validateToken();
+        if (!isValid) {
+            AuthManager.removeToken();
+            throw new Error('Your session has expired. Please log in again.');
+        }
+
+        // Get the summary text from sessionStorage or the displayed content
+        let summaryText = sessionStorage.getItem(`summary_${tenderId}`);
+        
+        if (!summaryText) {
+            // Try to extract from the displayed summary
+            const summaryElement = summaryContent.querySelector('p');
+            if (summaryElement) {
+                summaryText = summaryElement.textContent;
+            } else {
+                // Fallback: get from the entire summary content
+                summaryText = summaryContent.textContent;
+            }
+        }
+
+        if (!summaryText || summaryText.includes('Generating AI summary') || summaryText.includes('No summary available')) {
+            throw new Error('Please generate AI summary first by clicking "AI Summarization"');
+        }
+
+        console.log(`📝 Using summary text (${summaryText.length} chars) for matching`);
+
+        // Call the match API
+        const response = await fetch(`${API_BASE}/api/tenders/${tenderId}/match`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...AuthManager.getAuthHeaders()
+            },
+            body: JSON.stringify({
+                summary: summaryText,
+                tender_id: tenderId
+            })
+        });
+
+        console.log('📡 Match API response status:', response.status);
+
+        // Handle authentication errors
+        if (response.status === 401) {
+            AuthManager.removeToken();
+            throw new Error('Authentication failed. Please log in again.');
+        }
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Match failed: ${response.status} - ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log('✅ Match result:', result);
+
+        if (result.success) {
+            // Display match results
+            displayMatchResults(summaryContent, result, tenderId);
+            
+            // Update button to show success
+            matchButton.textContent = '✓ Matched';
+            matchButton.style.background = '#27ae60';
+            matchButton.disabled = true;
+            
+            console.log('🎉 Match completed successfully');
+            
+        } else {
+            throw new Error(result.detail || result.error || 'Matching failed');
+        }
+
+    } catch (error) {
+        console.error('❌ Error matching tender:', error);
+        
+        // Reset button
+        matchButton.textContent = originalText;
+        matchButton.disabled = false;
+        
+        // Show error message
+        if (error.message.includes('log in') || error.message.includes('session') || error.message.includes('Authentication')) {
+            // Store the current tender ID for after login
+            sessionStorage.setItem('pending_tender_match', tenderId);
+            
+            summaryContent.innerHTML += `
+                <div style="color: #e74c3c; margin-top: 15px; padding: 15px; background: #ffe6e6; border-radius: 5px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">🔐 Authentication Required</div>
+                    <div>${error.message}</div>
+                    <div style="margin-top: 10px;">
+                        <button onclick="handleAuthRedirect('${tenderId}')" 
+                                style="background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+                                Login Now
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else if (error.message.includes('generate AI summary')) {
+            summaryContent.innerHTML += `
+                <div style="color: #e74c3c; margin-top: 15px; padding: 15px; background: #ffe6e6; border-radius: 5px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">🤖 Summary Required</div>
+                    <div>${error.message}</div>
+                    <div style="margin-top: 10px;">
+                        <button onclick="generateAISummary('${tenderId}')" 
+                                style="background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+                                Generate AI Summary
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else {
+            summaryContent.innerHTML += `
+                <div style="color: #e74c3c; margin-top: 15px; padding: 15px; background: #ffe6e6; border-radius: 5px;">
+                    <div style="font-weight: bold; margin-bottom: 5px;">❌ Failed to Match Tender</div>
+                    <div>Error: ${error.message}</div>
+                    <button onclick="retryMatch('${tenderId}')" style="background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                        🔄 Retry
+                    </button>
+                </div>
+            `;
+        }
+    }
+}
+
+// Helper functions for tender matching
+function displayMatchResults(container, result, tenderId) {
+    const score = result.suitability_score || 0;
+    const scoreColor = getScoreColor(score);
+    const tenderReqs = result.tender_requirements || {};
+    
+    const matchHTML = `
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #bdc3c7;">
+            <!-- Score and Recommendation -->
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 20px;">
+                <!-- Score Card -->
+                <div style="background: ${scoreColor.background}; color: white; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <div style="font-size: 0.9em; margin-bottom: 5px;">SUITABILITY SCORE</div>
+                    <div style="font-size: 2.5em; font-weight: bold; margin: 10px 0;">${score}%</div>
+                    <div style="font-size: 0.9em; background: rgba(255,255,255,0.2); padding: 5px; border-radius: 5px;">
+                        ${result.matched_criteria || 0}/${result.total_criteria || 0} Criteria Met
+                    </div>
+                </div>
+                
+                <!-- Recommendation -->
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid ${scoreColor.border};">
+                    <div style="font-weight: bold; color: #2c3e50; margin-bottom: 10px;">💡 RECOMMENDATION</div>
+                    <div style="color: #2c3e50; line-height: 1.5;">${result.recommendation || 'No recommendation available'}</div>
+                </div>
+            </div>
+
+            <!-- Tender Requirements Summary -->
+            ${tenderReqs.objective || tenderReqs.scope ? `
+                <div style="margin-bottom: 20px;">
+                    <div style="font-weight: bold; color: #2c3e50; margin-bottom: 15px;">📋 TENDER REQUIREMENTS SUMMARY</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        ${tenderReqs.objective ? `
+                            <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db;">
+                                <div style="font-weight: bold; color: #3498db; margin-bottom: 5px;">🎯 Objective</div>
+                                <div style="color: #2c3e50; font-size: 0.9em;">${tenderReqs.objective}</div>
+                            </div>
+                        ` : ''}
+                        ${tenderReqs.scope ? `
+                            <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #e67e22;">
+                                <div style="font-weight: bold; color: #e67e22; margin-bottom: 5px;">📋 Scope</div>
+                                <div style="color: #2c3e50; font-size: 0.9em;">${tenderReqs.scope}</div>
+                            </div>
+                        ` : ''}
+                        ${tenderReqs.deadline ? `
+                            <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #e74c3c;">
+                                <div style="font-weight: bold; color: #e74c3c; margin-bottom: 5px;">⏰ Deadline</div>
+                                <div style="color: #2c3e50; font-size: 0.9em;">${tenderReqs.deadline}</div>
+                            </div>
+                        ` : ''}
+                        ${tenderReqs.budget ? `
+                            <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #27ae60;">
+                                <div style="font-weight: bold; color: #27ae60; margin-bottom: 5px;">💰 Budget</div>
+                                <div style="color: #2c3e50; font-size: 0.9em;">${tenderReqs.budget}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            ` : ''}
+
+            <!-- Detailed Checklist -->
+            <div style="margin-bottom: 20px;">
+                <div style="font-weight: bold; color: #2c3e50; margin-bottom: 15px;">📋 DETAILED SUITABILITY ANALYSIS</div>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 8px;">
+                    ${renderEnhancedChecklistItems(result.checklist || [])}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="margin-top: 20px; text-align: center;">
+                <button onclick="saveTenderToWorkspace('${tenderId}')" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 0 5px; cursor: pointer;">
+                    💼 Save to Workspace
+                </button>
+                <button onclick="viewMatchHistory()" style="background: #95a5a6; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 0 5px; cursor: pointer;">
+                    📊 View Match History
+                </button>
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML += matchHTML;
+}
+function renderEnhancedChecklistItems(checklist) {
+    if (!checklist || checklist.length === 0) {
+        return '<div style="text-align: center; color: #6c757d; padding: 20px;">No analysis available</div>';
+    }
+    
+    return checklist.map(item => {
+        const isMet = item.includes('✅');
+        const color = isMet ? '#28a745' : '#dc3545';
+        const icon = isMet ? '✅' : '❌';
+        const category = getChecklistCategory(item);
+        
+        return `
+            <div style="display: flex; align-items: flex-start; padding: 12px; background: white; border-radius: 8px; border-left: 4px solid ${color}; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <span style="margin-right: 12px; font-size: 1.1em; margin-top: 2px;">${icon}</span>
+                <div style="flex: 1;">
+                    <div style="font-weight: 500; color: #2c3e50; margin-bottom: 4px;">${category}</div>
+                    <div style="color: #6c757d; font-size: 0.9em;">${item.replace('✅', '').replace('❌', '').replace(/^.*?:/, '').trim()}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function getChecklistCategory(item) {
+    if (item.includes('Industry')) return 'Industry Match';
+    if (item.includes('Experience')) return 'Experience Level';
+    if (item.includes('Location')) return 'Geographic Coverage';
+    if (item.includes('CIDB')) return 'CIDB Certification';
+    if (item.includes('BBBEE')) return 'BBBEE Status';
+    if (item.includes('Capacity')) return 'Company Capacity';
+    if (item.includes('Financial')) return 'Financial Capacity';
+    if (item.includes('Certification')) return 'Certifications';
+    return 'General Requirement';
+}
+
+function getScoreColor(score) {
+    if (score >= 80) return { background: '#27ae60', border: '#27ae60' };
+    if (score >= 60) return { background: '#f39c12', border: '#f39c12' };
+    if (score >= 40) return { background: '#e67e22', border: '#e67e22' };
+    return { background: '#e74c3c', border: '#e74c3c' };
+}
+
+function renderChecklistItems(checklist) {
+    if (!checklist || checklist.length === 0) {
+        return '<div style="grid-column: 1 / -1; text-align: center; color: #6c757d; padding: 20px;">No checklist items available</div>';
+    }
+    
+    return checklist.map(item => {
+        const isMet = item.includes('✅');
+        const color = isMet ? '#28a745' : '#dc3545';
+        const icon = isMet ? '✅' : '❌';
+        
+        return `
+            <div style="display: flex; align-items: center; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid ${color};">
+                <span style="margin-right: 10px; font-size: 1.2em;">${icon}</span>
+                <span style="flex: 1;">${item.replace('✅ YES', '').replace('❌ NO', '').trim()}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function displayProfessionalSummary(container, result) {
+    container.innerHTML = `
+        <div style="margin-bottom: 15px;">
+            <h4 style="color: #2c3e50; margin-bottom: 10px;">📋 AI Summary</h4>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db;">
+                <p style="margin: 0; line-height: 1.6; color: #2c3e50;">${result.summary}</p>
+            </div>
+        </div>
+        
+        ${result.key_points ? `
+            <div style="margin-bottom: 15px;">
+                <h4 style="color: #2c3e50; margin-bottom: 10px;">🎯 Key Points</h4>
+                <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef;">
+                    <ul style="margin: 0; padding-left: 20px;">
+                        ${result.key_points.map(point => `<li style="margin-bottom: 8px; color: #2c3e50;">${point}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+        ` : ''}
+        
+        <div style="background: #d4edda; padding: 10px; border-radius: 5px; text-align: center;">
+            ✅ AI analysis completed successfully
+        </div>
+    `;
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    document.querySelectorAll('.notification').forEach(n => n.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 5px;
+        color: white;
+        z-index: 10000;
+        max-width: 400px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    if (type === 'success') {
+        notification.style.background = '#27ae60';
+    } else if (type === 'error') {
+        notification.style.background = '#e74c3c';
+    } else if (type === 'info') {
+        notification.style.background = '#3498db';
+    }
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
+}
+
+// Filter functions
+function applyFilters() {
+    const budgetMin = document.getElementById('budgetMin').value ? parseInt(document.getElementById('budgetMin').value) : 0;
+    const budgetMax = document.getElementById('budgetMax').value ? parseInt(document.getElementById('budgetMax').value) : Infinity;
+    const deadlineRange = document.getElementById('deadlineRange').value;
+    
+    filteredTenders = allTenders.filter(tender => {
+        const amount = tender.value?.amount || 0;
+        const endDate = tender.tender?.tenderPeriod?.endDate;
+        
+        // Budget filter
+        if (amount < budgetMin || amount > budgetMax) {
+            return false;
+        }
+        
+        // Deadline filter
+        if (deadlineRange && endDate) {
+            const deadlineDate = new Date(endDate);
+            const today = new Date();
+            
+            switch (deadlineRange) {
+                case '7':
+                    const nextWeek = new Date();
+                    nextWeek.setDate(today.getDate() + 7);
+                    if (deadlineDate < today || deadlineDate > nextWeek) return false;
+                    break;
+                case '30':
+                    const nextMonth = new Date();
+                    nextMonth.setDate(today.getDate() + 30);
+                    if (deadlineDate < today || deadlineDate > nextMonth) return false;
+                    break;
+                case '90':
+                    const nextQuarter = new Date();
+                    nextQuarter.setDate(today.getDate() + 90);
+                    if (deadlineDate < today || deadlineDate > nextQuarter) return false;
+                    break;
+                case 'expired':
+                    if (deadlineDate >= today) return false;
+                    break;
+            }
+        }
+        
+        return true;
+    });
+    
+    // Update results count
+    document.getElementById('resultsCount').textContent = 
+        `Showing ${filteredTenders.length} of ${allTenders.length} tenders after filtering`;
+    
+    renderTenders(filteredTenders);
+}
+
+function clearFilters() {
+    document.getElementById('budgetMin').value = '';
+    document.getElementById('budgetMax').value = '';
+    document.getElementById('deadlineRange').value = '';
+    
+    filteredTenders = [...allTenders];
+    document.getElementById('resultsCount').textContent = 
+        `Showing all ${allTenders.length} tenders`;
+    
+    renderTenders(filteredTenders);
+}
+
+// Company Profile Implementation
+function initializeCompanyProfile() {
+    console.log("Initializing company profile...");
+    
+    // Check if user is logged in
+    if (!AuthManager.isAuthenticated()) {
+        showAuthRequiredMessage();
+        return;
+    }
+    
+    // Create company profile form
+    const profileFormHTML = `
+        <div style="padding: 20px;">
+            <div style="max-width: 1000px; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                    <h2 style="margin-bottom: 10px;">🏢 Company Profile</h2>
+                    <p>Create or update your company profile to enhance tender matching</p>
+                </div>
+                
+                <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                    <div id="profileError" class="error" style="display: none;"></div>
+                    
+                    <form id="companyProfileForm">
+                        <h3 style="margin: 30px 0 20px 0; padding-bottom: 10px; border-bottom: 2px solid #e9ecef; color: #2c3e50;">Company Information</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Company Name *</label>
+                            <input type="text" id="company_name" name="companyName" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Registration Number (CIPC)</label>
+                            <input type="text" id="registration_number" name="registrationNumber" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">VAT Number</label>
+                            <input type="text" id="vat_number" name="vatNumber" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                        </div>
+
+                        <h3 style="margin: 30px 0 20px 0; padding-bottom: 10px; border-bottom: 2px solid #e9ecef; color: #2c3e50;">Business Details</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Industry Sector *</label>
+                            <select id="industry_sector" name="industrySector" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                                <option value="">Select Industry Sector</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Services Provided *</label>
+                            <textarea id="services_provided" name="servicesProvided" rows="3" placeholder="e.g., Construction, IT Services, Security" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;"></textarea>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Years of Experience</label>
+                            <input type="number" id="years_of_experience" name="yearsExperience" min="0" value="0" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                        </div>
+
+                        <h3 style="margin: 30px 0 20px 0; padding-bottom: 10px; border-bottom: 2px solid #e9ecef; color: #2c3e50;">Certifications</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">CIDB Grading</label>
+                            <select id="cidb_grading" name="cidbGrading" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                                <option value="">Select CIDB Grade</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">BBBEE Level</label>
+                            <select id="bbbee_level" name="bbbeeLevel" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                                <option value="">Select BBBEE Level</option>
+                            </select>
+                        </div>
+
+                        <h3 style="margin: 30px 0 20px 0; padding-bottom: 10px; border-bottom: 2px solid #e9ecef; color: #2c3e50;">Geographic Coverage</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Operating Provinces</label>
+                            <select id="operating_provinces" name="operatingProvinces" multiple size="4" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                                <option value="">Select Provinces (multiple)</option>
+                            </select>
+                        </div>
+
+                        <h3 style="margin: 30px 0 20px 0; padding-bottom: 10px; border-bottom: 2px solid #e9ecef; color: #2c3e50;">Contact Information</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Contact Email</label>
+                            <input type="email" id="contact_email" name="contactEmail" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Contact Phone</label>
+                            <input type="tel" id="contact_phone" name="contactPhone" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Physical Address</label>
+                            <textarea id="physical_address" name="physical_address" rows="3" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;"></textarea>
+                        </div>
+
+                        <button type="submit" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%;">
+                            Save Company Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('pageContent').innerHTML = profileFormHTML;
+    
+    // Load form options and existing profile data
+    loadCompanyProfileData();
+    loadFormOptions();
+    
+    // Add event listener for form submission
+    document.getElementById('companyProfileForm').addEventListener('submit', handleCompanyProfileSubmit);
+}
+
+function initializeRegistration() {
+    console.log("Initializing registration...");
+    
+    // Create registration form
+    const registerFormHTML = `
+        <div style="padding: 20px;">
+            <div style="max-width: 500px; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+                    <h2 style="margin-bottom: 10px;">👥 Register</h2>
+                    <p>Create your account and team</p>
+                </div>
+                
+                <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                    <div id="error" class="error" style="display: none;"></div>
+                    
+                    <form id="registerForm">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Full Name *</label>
+                            <input type="text" id="fullName" name="fullName" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Email Address *</label>
+                            <input type="email" id="email" name="email" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Password *</label>
+                            <input type="password" id="password" name="password" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #2c3e50;">Team Name *</label>
+                            <input type="text" id="teamName" name="teamName" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;">
+                        </div>
+
+                        <button type="submit" style="background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%;">
+                            Create Account
+                        </button>
+                    </form>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <p>Already have an account? <a href="#" onclick="navigateTo('login')" style="color: #3498db; text-decoration: none;">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('pageContent').innerHTML = registerFormHTML;
+    
+    // Add event listener for registration form
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const submitButton = e.target.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+        submitButton.textContent = 'Creating Account...';
+        submitButton.disabled = true;
+        
+        const errorDiv = document.getElementById('error');
+        errorDiv.style.display = 'none';
+        
+        try {
+            const formData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                full_name: document.getElementById('fullName').value,
+                team_name: document.getElementById('teamName').value
+            };
+
+            const response = await fetch(`${API_BASE}/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok) {
+                alert('✅ Account created successfully! Please login.');
+                navigateTo('/login');
+            } else {
+                errorDiv.textContent = `❌ Error: ${responseData.detail || 'Registration failed'}`;
+                errorDiv.style.display = 'block';
+            }
+            
+        } catch (error) {
+            errorDiv.textContent = '❌ Network error: Failed to connect to server';
+            errorDiv.style.display = 'block';
+            console.error('Registration error:', error);
+        } finally {
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+        }
+    });
+}
+
+function initializeLogin() {
+    console.log("Initializing login page...");
+    
+    const loginHTML = `
+        <div style="max-width: 400px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px; text-align: center;">🔐 Login</h2>
+            
+            <form id="loginForm" onsubmit="handleLogin(event)" style="background: #f8f9fa; padding: 30px; border-radius: 10px;">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="loginEmail" 
+                        required
+                        placeholder="Enter your email"
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input 
+                        type="password" 
+                        id="loginPassword" 
+                        required
+                        placeholder="Enter your password"
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"
+                    >
+                </div>
+                
+                <button 
+                    type="submit" 
+                    id="loginButton"
+                    style="width: 100%; background: #3498db; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; font-size: 16px;"
+                >
+                    Login
+                </button>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <span>Don't have an account? </span>
+                    <a href="#register" onclick="navigateTo('register')" style="color: #3498db;">Register here</a>
+                </div>
+            </form>
+            
+            <div id="loginMessage" style="margin-top: 20px;"></div>
+        </div>
+    `;
+    
+    document.getElementById('pageContent').innerHTML = loginHTML;
+}
+
+// Handle login form submission - FIXED: Initialize user-specific plan data
+async function handleLogin(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const loginButton = document.getElementById('loginButton');
+    const messageDiv = document.getElementById('loginMessage');
+    
+    // Show loading state
+    loginButton.textContent = 'Logging in...';
+    loginButton.disabled = true;
+    messageDiv.innerHTML = '';
+    
+    try {
+        console.log('🔐 Attempting login for:', email);
+        
+        const response = await fetch(`${API_BASE}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+        console.log('Login API response:', data);
+        
+        if (response.ok && data.access_token) {
+            // Use AuthManager to store token
+            AuthManager.setToken(data.access_token);
+            localStorage.setItem('user_email', email);
+            
+            console.log('✅ Login successful, token stored:', data.access_token);
+            
+            // Initialize user-specific plan data if it doesn't exist
+            const userTeamKey = `current_team_${email}`;
+            if (!localStorage.getItem(userTeamKey)) {
+                localStorage.setItem(userTeamKey, JSON.stringify({ 
+                    plan: PlanManager.PLANS.FREE, 
+                    user_count: 1 
+                }));
+                console.log('✅ Initialized free plan for new user:', email);
+            }
+            
+            // Verify the token works
+            const isValid = await AuthManager.validateToken();
+            if (isValid) {
+                console.log('✅ Token validation successful');
+                
+                messageDiv.innerHTML = `
+                    <div style="color: #27ae60; background: #d4edda; padding: 10px; border-radius: 5px; text-align: center;">
+                        ✅ Login successful! Redirecting...
+                    </div>
+                `;
+                
+                // Check if there's a pending tender match
+                const pendingTenderMatch = sessionStorage.getItem('pending_tender_match');
+                
+                setTimeout(() => {
+                    if (pendingTenderMatch) {
+                        sessionStorage.removeItem('pending_tender_match');
+                        alert('Login successful! You can now match tenders.');
+                        navigateTo('tenders');
+                    } else {
+                        navigateTo('tenders');
+                    }
+                }, 1000);
+                
+            } else {
+                throw new Error('Token validation failed');
+            }
+        } else {
+            throw new Error(data.detail || 'Login failed');
+        }
+        
+    } catch (error) {
+        console.error('Login error:', error);
+        messageDiv.innerHTML = `
+            <div style="color: #e74c3c; background: #f8d7da; padding: 10px; border-radius: 5px;">
+                ❌ Login failed: ${error.message}
+            </div>
+        `;
+    } finally {
+        // Reset button
+        loginButton.textContent = 'Login';
+        loginButton.disabled = false;
+    }
+}
+
+// Load dropdown options
+async function loadFormOptions() {
+    try {
+        console.log('Loading form options...');
+        
+        // Load industries - try both endpoints to see which works
+        let industriesResponse;
+        try {
+            industriesResponse = await fetch(`${API_BASE}/api/company/options/industries`);
+            if (!industriesResponse.ok) {
+                industriesResponse = await fetch(`${API_BASE}/company/options/industries`);
+            }
+        } catch (error) {
+            console.error('Error loading industries:', error);
+            // Fallback to hardcoded options
+            populateFallbackOptions();
+            return;
+        }
+
+        const industriesData = await industriesResponse.json();
+        console.log('Industries data:', industriesData);
+        
+        const industrySelect = document.getElementById('industry_sector');
+        industrySelect.innerHTML = '<option value="">Select Industry Sector</option>';
+        
+        industriesData.industries.forEach(industry => {
+            const option = document.createElement('option');
+            option.value = industry;
+            option.textContent = industry;
+            industrySelect.appendChild(option);
+        });
+
+        // Load provinces
+        const provincesResponse = await fetch(`${API_BASE}/company/options/provinces`);
+        const provincesData = await provincesResponse.json();
+        console.log('Provinces data:', provincesData);
+        
+        const provinceSelect = document.getElementById('operating_provinces');
+        provinceSelect.innerHTML = '<option value="">Select Provinces (multiple)</option>';
+        
+        provincesData.provinces.forEach(province => {
+            const option = document.createElement('option');
+            option.value = province;
+            option.textContent = province;
+            provinceSelect.appendChild(option);
+        });
+
+        // Load certifications
+        const certsResponse = await fetch(`${API_BASE}/company/options/certifications`);
+        const certsData = await certsResponse.json();
+        console.log('Certifications data:', certsData);
+        
+        // Populate CIDB grades
+        const cidbSelect = document.getElementById('cidb_grading');
+        cidbSelect.innerHTML = '<option value="">Select CIDB Grade</option>';
+        
+        certsData.certifications.cidb.forEach(grade => {
+            const option = document.createElement('option');
+            option.value = grade;
+            option.textContent = grade;
+            cidbSelect.appendChild(option);
+        });
+
+        // Populate BBBEE levels
+        const bbbeeSelect = document.getElementById('bbbee_level');
+        bbbeeSelect.innerHTML = '<option value="">Select BBBEE Level</option>';
+        
+        certsData.certifications.bbbee.forEach(level => {
+            const option = document.createElement('option');
+            option.value = level;
+            option.textContent = level;
+            bbbeeSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error('Error loading form options:', error);
+        // Fallback to hardcoded options if API fails
+        populateFallbackOptions();
+    }
+}
+
+// Fallback function with hardcoded options
+function populateFallbackOptions() {
+    console.log('Using fallback options');
+    
+    // Hardcoded industry sectors
+    const industries = [
+        "Construction & Engineering",
+        "IT & Technology Services", 
+        "Security Services",
+        "Cleaning & Maintenance",
+        "Transport & Logistics",
+        "Education & Training",
+        "Healthcare Services",
+        "Manufacturing",
+        "Agriculture",
+        "Mining",
+        "Tourism & Hospitality",
+        "Financial Services",
+        "Consulting",
+        "Other"
+    ];
+    
+    const industrySelect = document.getElementById('industry_sector');
+    industrySelect.innerHTML = '<option value="">Select Industry Sector</option>';
+    industries.forEach(industry => {
+        const option = document.createElement('option');
+        option.value = industry;
+        option.textContent = industry;
+        industrySelect.appendChild(option);
+    });
+    
+    // Hardcoded provinces
+    const provinces = [
+        "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal",
+        "Limpopo", "Mpumalanga", "Northern Cape", "North West", "Western Cape"
+    ];
+    
+    const provinceSelect = document.getElementById('operating_provinces');
+    provinceSelect.innerHTML = '<option value="">Select Provinces (multiple)</option>';
+    provinces.forEach(province => {
+        const option = document.createElement('option');
+        option.value = province;
+        option.textContent = province;
+        provinceSelect.appendChild(option);
+    });
+    
+    // Hardcoded certifications
+    const cidbGrades = ["Grade 1", "Grade 2", "Grade 3", "Grade 4", "Grade 5", "Grade 6", "Grade 7", "Grade 8", "Grade 9"];
+    const bbbeeLevels = ["Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6", "Level 7", "Level 8"];
+    
+    const cidbSelect = document.getElementById('cidb_grading');
+    cidbSelect.innerHTML = '<option value="">Select CIDB Grade</option>';
+    cidbGrades.forEach(grade => {
+        const option = document.createElement('option');
+        option.value = grade;
+        option.textContent = grade;
+        cidbSelect.appendChild(option);
+    });
+    
+    const bbbeeSelect = document.getElementById('bbbee_level');
+    bbbeeSelect.innerHTML = '<option value="">Select BBBEE Level</option>';
+    bbbeeLevels.forEach(level => {
+        const option = document.createElement('option');
+        option.value = level;
+        option.textContent = level;
+        bbbeeSelect.appendChild(option);
+    });
+}
+
+// Handle form submission
+async function handleCompanyProfileSubmit(e) {
+    e.preventDefault();
+    
+    // Show loading state
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.textContent = 'Saving...';
+    submitButton.disabled = true;
+    
+    try {
+        const token = localStorage.getItem('access_token');
+        
+        const formData = {
+            company_name: document.getElementById('company_name').value,
+            registration_number: document.getElementById('registration_number').value || null,
+            vat_number: document.getElementById('vat_number').value || null,
+            industry_sector: document.getElementById('industry_sector').value,
+            services_provided: document.getElementById('services_provided').value,
+            years_of_experience: parseInt(document.getElementById('years_of_experience').value) || 0,
+            cidb_grading: document.getElementById('cidb_grading').value || null,
+            bbbee_level: document.getElementById('bbbee_level').value || null,
+            operating_provinces: Array.from(document.getElementById('operating_provinces').selectedOptions)
+                .map(option => option.value)
+                .filter(value => value)
+                .join(',') || null,
+            contact_email: document.getElementById('contact_email').value || null,
+            contact_phone: document.getElementById('contact_phone').value || null,
+            physical_address: document.getElementById('physical_address').value || null,
+            
+        };
+
+        // Change from /api/company/profile to /api/company/profiles
+        const response = await fetch(`${API_BASE}/company/profiles`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const responseData = await response.json();
+
+        if (response.ok) {
+            alert('✅ Company profile saved successfully!');
+            navigateTo('home');
+        } else {
+            const errorMessage = responseData.detail || responseData.message || 'Unknown error occurred';
+            alert(`❌ Error: ${errorMessage}`);
+        }
+        
+    } catch (error) {
+        console.error('Network error:', error);
+        alert('❌ Network error: Failed to connect to server. Please check if the server is running.');
+    } finally {
+        // Restore button state
+        submitButton.textContent = originalText;
+        submitButton.disabled = false;
+    }
+}
+
+// Workspace Management
+// Workspace Management
+// Ultra-Simple Workspace
+// Workspace Management
+let currentWorkspaceStatus = 'all';
+
+async function initializeWorkspace() {
+    console.log("Initializing workspace...");
+    
+    const workspaceHTML = `
+        <div class="workspace-container">
+            <div class="workspace-header">
+                <h2>🏢 Company Workspace</h2>
+                <p>Manage and track your tender applications</p>
+            </div>
+            
+            <!-- Status Filter -->
+            <div class="status-filters">
+                <button class="status-filter ${currentWorkspaceStatus === 'all' ? 'active' : ''}" onclick="filterWorkspace('all')">
+                    All Tenders
+                </button>
+                <button class="status-filter ${currentWorkspaceStatus === 'pending' ? 'active' : ''}" onclick="filterWorkspace('pending')">
+                    ⏳ Pending
+                </button>
+                <button class="status-filter ${currentWorkspaceStatus === 'interested' ? 'active' : ''}" onclick="filterWorkspace('interested')">
+                    💡 Interested
+                </button>
+                <button class="status-filter ${currentWorkspaceStatus === 'not_eligible' ? 'active' : ''}" onclick="filterWorkspace('not_eligible')">
+                    ❌ Not Eligible
+                </button>
+                <button class="status-filter ${currentWorkspaceStatus === 'submitted' ? 'active' : ''}" onclick="filterWorkspace('submitted')">
+                    📤 Submitted
+                </button>
+                <button class="status-filter ${currentWorkspaceStatus === 'won' ? 'active' : ''}" onclick="filterWorkspace('won')">
+                    🏆 Won
+                </button>
+                <button class="status-filter ${currentWorkspaceStatus === 'lost' ? 'active' : ''}" onclick="filterWorkspace('lost')">
+                    💔 Lost
+                </button>
+            </div>
+            
+            <!-- Workspace Stats -->
+            <div class="workspace-stats" id="workspaceStats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalTenders">0</div>
+                    <div class="stat-label">Total Tenders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgMatchScore">0%</div>
+                    <div class="stat-label">Avg Match Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="upcomingDeadlines">0</div>
+                    <div class="stat-label">Upcoming Deadlines</div>
+                </div>
+            </div>
+            
+            <!-- Workspace Tenders -->
+            <div class="workspace-tenders" id="workspaceTenders">
+                <div class="loading">Loading workspace tenders...</div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('pageContent').innerHTML = workspaceHTML;
+    await loadWorkspaceTenders();
+}
+
+async function saveTenderToWorkspace(tenderId, matchScore = null) {
+    try {
+        console.log(`💾 Saving tender ${tenderId} to workspace...`);
+        
+        // Find tender in current search results
+        const tender = allTenders.find(t => t.id === tenderId);
+        
+        if (!tender) {
+            alert('❌ Tender data not found. Please try searching again.');
+            return;
+        }
+
+        console.log('Found tender:', tender);
+
+        // Calculate amount for budget display
+        const amount = tender.value?.amount || 0;
+        const budget = amount > 0 ? `R ${amount.toLocaleString()}` : 'Not specified';
+        
+        // Use the match score from the parameter, or calculate a default one
+        const finalMatchScore = matchScore !== null ? matchScore : calculateMatchScore(tender);
+
+        // Map the Tender model fields to WorkspaceTender model fields
+        const saveData = {
+            tender_id: tender.id,  // Use the tender ID from search results
+            title: tender.title || 'No Title',
+            description: tender.description || '',
+            budget: budget,
+            province: tender.province || 'Not specified',
+            buyer_name: tender.buyer?.name || tender.publisher?.name || 'Unknown',
+            deadline: tender.tender?.tenderPeriod?.endDate || null,
+            ai_summary: getAISummary(tenderId), // Get from sessionStorage if available
+            match_score: finalMatchScore,
+            match_recommendation: matchScore !== null ? 'AI Matched Tender' : 'Saved from search results',
+            user_id: 1,
+            company_id: 1
+        };
+
+        console.log('📤 Sending save data:', saveData);
+
+        const response = await fetch(`${API_BASE}/api/workspace/tenders`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify(saveData)
+        });
+
+        const result = await response.json();
+        console.log('📨 Save response:', result);
+        
+        if (result.success) {
+            showNotification('✅ Tender saved to workspace!', 'success');
+            
+            // Update the save button to show it's saved
+            updateSaveButtonUI(tenderId, true);
+            
+        } else {
+            throw new Error(result.detail || 'Failed to save tender');
+        }
+
+    } catch (error) {
+        console.error('Error saving to workspace:', error);
+        showNotification('❌ Failed to save tender: ' + error.message, 'error');
+    }
+}
+async function loadWorkspaceTenders(status = 'all') {
+    try {
+        console.log(`📂 Loading workspace tenders with status: ${status}`);
+        
+        const url = status !== 'all' 
+            ? `${API_BASE}/api/workspace/tenders?status=${status}`
+            : `${API_BASE}/api/workspace/tenders`;
+            
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        console.log('Workspace API response:', data);
+        
+        if (data.success) {
+            displayWorkspaceTenders(data.tenders);
+            updateWorkspaceStats(data);
+        } else {
+            throw new Error(data.detail || 'Failed to load workspace');
+        }
+    } catch (error) {
+        console.error('Error loading workspace:', error);
+        document.getElementById('workspaceTenders').innerHTML = `
+            <div class="error-message">
+                Failed to load workspace: ${error.message}
+            </div>
+        `;
+    }
+}
+
+function displayWorkspaceTenders(tenders) {
+    const container = document.getElementById('workspaceTenders');
+    
+    console.log("📋 Displaying workspace tenders:", tenders);
+    
+    if (tenders.length === 0) {
+        container.innerHTML = `
+            <div class="empty-workspace">
+                <div style="font-size: 4em; margin-bottom: 20px;">📋</div>
+                <h3>No tenders in workspace</h3>
+                <p>Save tenders from the search page to start tracking them here.</p>
+                <button onclick="showTenderSearch()" class="btn-primary">
+                    Search Tenders
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = tenders.map(tender => {
+        console.log(`🎯 Tender ID: ${tender.id}, Workspace ID: ${tender.id}`);
+        return `
+        <div class="workspace-tender-card" data-workspace-id="${tender.id}">
+            <div class="tender-header">
+                <h3 class="tender-title">${tender.title}</h3>
+                <div class="tender-meta">
+                    <span class="match-score ${getScoreClass(tender.match_score)}">
+                        ${tender.match_score}% Match
+                    </span>
+                    <span class="status-badge status-${tender.status}">
+                        ${getStatusDisplay(tender.status)}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="tender-details">
+                <div class="detail-row">
+                    <span class="detail-label">📅 Deadline:</span>
+                    <span class="detail-value">${tender.deadline ? formatDate(tender.deadline) : 'Not specified'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">💰 Budget:</span>
+                    <span class="detail-value">${tender.budget || 'Not specified'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">📍 Province:</span>
+                    <span class="detail-value">${tender.province || 'Not specified'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">🏢 Buyer:</span>
+                    <span class="detail-value">${tender.buyer_name || 'Not specified'}</span>
+                </div>
+            </div>
+            
+            ${tender.ai_summary ? `
+                <div class="ai-summary">
+                    <strong>🤖 AI Summary:</strong>
+                    <p>${tender.ai_summary}</p>
+                </div>
+            ` : ''}
+            
+            <div class="tender-actions">
+                <select class="status-select" onchange="updateTenderStatus(${tender.id}, this.value)">
+                    <option value="pending" ${tender.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
+                    <option value="interested" ${tender.status === 'interested' ? 'selected' : ''}>💡 Interested</option>
+                    <option value="not_eligible" ${tender.status === 'not_eligible' ? 'selected' : ''}>❌ Not Eligible</option>
+                    <option value="submitted" ${tender.status === 'submitted' ? 'selected' : ''}>📤 Submitted</option>
+                    <option value="won" ${tender.status === 'won' ? 'selected' : ''}>🏆 Won</option>
+                    <option value="lost" ${tender.status === 'lost' ? 'selected' : ''}>💔 Lost</option>
+                </select>
+                
+                <button onclick="showTenderNotes(${tender.id})" class="btn-secondary">
+                    💬 Notes
+                </button>
+                
+                <button onclick="removeFromWorkspace(${tender.id})" class="btn-danger">
+                    🗑️ Remove
+                </button>
+                
+                <!-- Debug info -->
+                <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
+                    ID: ${tender.id} | Tender ID: ${tender.tender_id}
+                </div>
+            </div>
+            
+            <div class="tender-notes" id="notes-${tender.id}" style="display: none;">
+                <!-- Notes will be loaded here -->
+            </div>
+        </div>
+    `}).join('');
+}
+function updateWorkspaceStats(data) {
+    const totalTenders = data.total_count || 0;
+    const avgScore = data.tenders.length > 0 ? 
+        Math.round(data.tenders.reduce((sum, t) => sum + (t.match_score || 0), 0) / data.tenders.length) : 0;
+    const upcomingDeadlines = data.tenders.filter(t => {
+        if (!t.deadline) return false;
+        const deadline = new Date(t.deadline);
+        const today = new Date();
+        const daysDiff = (deadline - today) / (1000 * 60 * 60 * 24);
+        return daysDiff > 0 && daysDiff <= 30;
+    }).length;
+    
+    document.getElementById('totalTenders').textContent = totalTenders;
+    document.getElementById('avgMatchScore').textContent = `${avgScore}%`;
+    document.getElementById('upcomingDeadlines').textContent = upcomingDeadlines;
+}
+
+async function saveTenderToWorkspace(tenderId, matchScore = null) {
+    try {
+        console.log(`💾 Saving tender ${tenderId} to workspace...`);
+        
+        // Find tender in current search results
+        const tender = allTenders.find(t => t.id === tenderId);
+        
+        if (!tender) {
+            alert('❌ Tender data not found. Please try searching again.');
+            return;
+        }
+
+        console.log('Found tender:', tender);
+
+        // Calculate amount for budget display
+        const amount = tender.value?.amount || 0;
+        const budget = amount > 0 ? `R ${amount.toLocaleString()}` : 'Not specified';
+        
+        // Use the match score from the parameter, or calculate a default one
+        const finalMatchScore = matchScore !== null ? matchScore : calculateMatchScore(tender);
+
+        // Map the Tender model fields to WorkspaceTender model fields
+        const saveData = {
+            tender_id: tender.id,  // Use the tender ID from search results
+            title: tender.title || 'No Title',
+            description: tender.description || '',
+            budget: budget,
+            province: tender.province || 'Not specified',
+            buyer_name: tender.buyer?.name || tender.publisher?.name || 'Unknown',
+            deadline: tender.tender?.tenderPeriod?.endDate || null,
+            ai_summary: getAISummary(tenderId), // Get from sessionStorage if available
+            match_score: finalMatchScore,
+            match_recommendation: matchScore !== null ? 'AI Matched Tender' : 'Saved from search results',
+            user_id: 1,
+            company_id: 1
+        };
+
+        console.log('📤 Sending save data:', saveData);
+
+        const response = await fetch(`${API_BASE}/api/workspace/tenders`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify(saveData)
+        });
+
+        const result = await response.json();
+        console.log('📨 Save response:', result);
+        
+        if (result.success) {
+            showNotification('✅ Tender saved to workspace!', 'success');
+            
+            // Update the save button to show it's saved
+            updateSaveButtonUI(tenderId, true);
+            
+        } else {
+            throw new Error(result.detail || 'Failed to save tender');
+        }
+
+    } catch (error) {
+        console.error('Error saving to workspace:', error);
+        showNotification('❌ Failed to save tender: ' + error.message, 'error');
+    }
+}
+
+// Helper function to get AI summary from sessionStorage
+function getAISummary(tenderId) {
+    const summary = sessionStorage.getItem(`summary_${tenderId}`);
+    return summary || 'AI summary not available';
+}
+
+// Helper function to update the save button UI
+function updateSaveButtonUI(tenderId, isSaved) {
+    const actionButtons = document.getElementById(`action-buttons-${tenderId}`);
+    
+    if (isSaved && actionButtons) {
+        actionButtons.innerHTML = `
+            <button class="action-btn save-btn" disabled style="background: #27ae60; color: white;">
+                <span class="btn-icon">✅</span>
+                Saved to Workspace
+            </button>
+        `;
+    }
+}
+
+// Simple match score calculation (fallback)
+function calculateMatchScore(tender) {
+    let score = 50; // Base score
+    
+    // Add points based on criteria
+    if (tender.value?.amount && tender.value.amount > 0) score += 10;
+    if (tender.province) score += 10;
+    if (tender.description && tender.description.length > 100) score += 10;
+    if (tender.buyer?.name) score += 10;
+    if (tender.tender?.tenderPeriod?.endDate) score += 10;
+    
+    return Math.min(score, 100); // Cap at 100
+}
+
+// Helper function for score colors (used in showSaveButton)
+function getScoreColor(score) {
+    if (score >= 80) return { background: '#27ae60', color: 'white' };
+    if (score >= 60) return { background: '#f39c12', color: 'white' };
+    if (score >= 40) return { background: '#e67e22', color: 'white' };
+    return { background: '#e74c3c', color: 'white' };
+}
+// Simple match score calculation - you can customize this
+function calculateMatchScore(tender) {
+    let score = 50; // Base score
+    
+    // Add points based on criteria
+    if (tender.estimated_value && tender.estimated_value > 0) score += 10;
+    if (tender.province) score += 10;
+    if (tender.description && tender.description.length > 100) score += 10;
+    if (tender.buyer_name) score += 10;
+    if (tender.submission_deadline) score += 10;
+    
+    return Math.min(score, 100); // Cap at 100
+}
+
+async function updateTenderStatus(workspaceTenderId, newStatus) {
+    console.log(`🔄 Updating status for workspace tender ID: ${workspaceTenderId} to ${newStatus}`);
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/workspace/tenders/${workspaceTenderId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                status: newStatus
+            })
+        });
+        
+        console.log("📡 Status update response status:", response.status);
+        
+        const result = await response.json();
+        console.log("📡 Status update result:", result);
+        
+        if (result.success) {
+            console.log("✅ Status updated successfully");
+            showNotification(`✅ Status updated to ${getStatusDisplay(newStatus)}`, 'success');
+            
+            // Update UI immediately
+            const statusBadge = document.querySelector(`[data-workspace-id="${workspaceTenderId}"] .status-badge`);
+            const statusSelect = document.querySelector(`[data-workspace-id="${workspaceTenderId}"] .status-select`);
+            
+            if (statusBadge) {
+                statusBadge.className = `status-badge status-${newStatus}`;
+                statusBadge.textContent = getStatusDisplay(newStatus);
+            }
+            if (statusSelect) {
+                statusSelect.value = newStatus;
+            }
+            
+        } else {
+            console.error("❌ Status update failed:", result.detail);
+            showNotification(`❌ Failed: ${result.detail}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error updating status:', error);
+        showNotification(`❌ Error: ${error.message}`, 'error');
+    }
+}
+function updateTenderStatusUI(workspaceTenderId, newStatus) {
+    // Update the status badge
+    const statusBadge = document.querySelector(`[data-tender-id="${workspaceTenderId}"] .status-badge`);
+    if (statusBadge) {
+        statusBadge.className = `status-badge status-${newStatus}`;
+        statusBadge.textContent = getStatusDisplay(newStatus);
+    }
+    
+    // Update the select dropdown
+    const statusSelect = document.querySelector(`[data-tender-id="${workspaceTenderId}"] .status-select`);
+    if (statusSelect) {
+        statusSelect.value = newStatus;
+    }
+}
+async function showTenderNotes(workspaceTenderId) {
+    const notesContainer = document.getElementById(notes-${workspaceTenderId});
+    
+    // Toggle notes visibility
+    if (notesContainer.style.display === 'block') {
+        notesContainer.style.display = 'none';
+        return;
+    }
+    
+    try {
+        console.log(📝 Loading notes for workspace tender ${workspaceTenderId}...);
+        
+        const response = await fetch(${API_BASE}/api/workspace/tenders/${workspaceTenderId}/notes);
+        const data = await response.json();
+        
+        console.log('Notes API response:', data);
+        
+        if (data.success) {
+            const notes = data.notes || [];
+            const hasNotes = notes.length > 0;
+            
+            const notesHTML = hasNotes ? 
+                notes.map(note => `
+                    <div class="note-item ${note.is_task ? 'task-note' : ''} ${note.task_completed ? 'task-completed' : ''}" data-note-id="${note.id}">
+                        <div class="note-content">${note.content}</div>
+                        ${note.is_task ? `
+                            <div class="task-info">
+                                <span>Assigned to: User ${note.task_assigned_to || 'Unassigned'}</span>
+                                ${note.task_due_date ? <span>Due: ${formatDate(note.task_due_date)}</span> : ''}
+                                <span class="task-status ${note.task_completed ? 'completed' : 'pending'}">
+                                    ${note.task_completed ? '✅ Completed' : '⏳ Pending'}
+                                </span>
+                                ${!note.task_completed ? `
+                                    <button onclick="markTaskComplete(${workspaceTenderId}, ${note.id})" class="btn-small">
+                                        ✅ Mark Complete
+                                    </button>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                        <div class="note-meta">
+                            Added ${note.created_at ? new Date(note.created_at).toLocaleDateString() : 'Recently'}
+                            <button onclick="deleteNote(${workspaceTenderId}, ${note.id})" class="btn-small btn-danger" style="margin-left: 10px;">
+                                🗑 Delete
+                            </button>
+                        </div>
+                    </div>
+                `).join('') : 
+                <div class="no-notes">No notes yet. Add your first note below!</div>;
+            
+            notesContainer.innerHTML = `
+                <div class="notes-section">
+                    <h4>📝 Team Notes & Tasks</h4>
+                    <div class="notes-list">
+                        ${notesHTML}
+                    </div>
+                    
+                    <div class="add-note-form">
+                        <textarea 
+                            id="newNote-${workspaceTenderId}" 
+                            placeholder="Add a note or task description..." 
+                            rows="3"
+                        ></textarea>
+                        <div class="note-actions">
+                            <label class="task-checkbox">
+                                <input type="checkbox" id="isTask-${workspaceTenderId}"> 
+                                📋 Mark as task
+                            </label>
+                            <div class="task-fields" id="taskFields-${workspaceTenderId}" style="display: none;">
+                                <input type="number" id="taskAssignedTo-${workspaceTenderId}" placeholder="User ID" min="1">
+                                <input type="date" id="taskDueDate-${workspaceTenderId}">
+                            </div>
+                            <button onclick="addNoteToTender(${workspaceTenderId})" class="btn-primary">
+                                ➕ Add Note
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Show/hide task fields based on checkbox
+            document.getElementById(isTask-${workspaceTenderId}).addEventListener('change', function() {
+                const taskFields = document.getElementById(taskFields-${workspaceTenderId});
+                taskFields.style.display = this.checked ? 'block' : 'none';
+            });
+            
+            notesContainer.style.display = 'block';
+            
+        } else {
+            throw new Error(data.detail || 'Failed to load notes');
+        }
+        
+    } catch (error) {
+        console.error('Error loading notes:', error);
+        notesContainer.innerHTML = `
+            <div class="error-message">
+                Failed to load notes: ${error.message}
+            </div>
+        `;
+        notesContainer.style.display = 'block';
+    }
+}
+
+async function addNoteToTender(workspaceTenderId) {
+    const noteText = document.getElementById(newNote-${workspaceTenderId}).value;
+    const isTask = document.getElementById(isTask-${workspaceTenderId}).checked;
+    const taskAssignedTo = document.getElementById(taskAssignedTo-${workspaceTenderId})?.value;
+    const taskDueDate = document.getElementById(taskDueDate-${workspaceTenderId})?.value;
+    
+    if (!noteText.trim()) {
+        alert('Please enter note content');
+        return;
+    }
+    
+    try {
+        const noteData = {
+            content: noteText,
+            is_task: isTask
+        };
+        
+        // Add task-specific fields if it's a task
+        if (isTask) {
+            if (taskAssignedTo) noteData.task_assigned_to = parseInt(taskAssignedTo);
+            if (taskDueDate) noteData.task_due_date = taskDueDate;
+        }
+        
+        console.log('Sending note data:', noteData);
+        
+        const response = await fetch(${API_BASE}/api/workspace/tenders/${workspaceTenderId}/notes, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(noteData)
+        });
+        
+        const result = await response.json();
+        console.log('Add note response:', result);
+        
+        if (result.success) {
+            // Clear the form
+            document.getElementById(newNote-${workspaceTenderId}).value = '';
+            document.getElementById(isTask-${workspaceTenderId}).checked = false;
+            document.getElementById(taskFields-${workspaceTenderId}).style.display = 'none';
+            
+            // Show success message
+            showNotification('✅ Note added successfully!', 'success');
+            
+            // Reload notes to show the new one
+            await showTenderNotes(workspaceTenderId);
+        } else {
+            throw new Error(result.detail || 'Failed to add note');
+        }
+    } catch (error) {
+        console.error('Error adding note:', error);
+        showNotification('❌ Failed to add note: ' + error.message, 'error');
+    }
+}
+
+// New functions for note management
+async function markTaskComplete(workspaceTenderId, noteId) {
+    try {
+        const response = await fetch(${API_BASE}/api/workspace/tenders/${workspaceTenderId}/notes/${noteId}, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                task_completed: true
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('✅ Task marked as complete!', 'success');
+            await showTenderNotes(workspaceTenderId); // Reload notes
+        } else {
+            throw new Error(result.detail);
+        }
+    } catch (error) {
+        console.error('Error marking task complete:', error);
+        showNotification('❌ Failed to update task: ' + error.message, 'error');
+    }
+}
+
+async function deleteNote(workspaceTenderId, noteId) {
+    if (!confirm('Are you sure you want to delete this note?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(${API_BASE}/api/workspace/tenders/${workspaceTenderId}/notes/${noteId}, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('✅ Note deleted!', 'success');
+            await showTenderNotes(workspaceTenderId); // Reload notes
+        } else {
+            throw new Error(result.detail);
+        }
+    } catch (error) {
+        console.error('Error deleting note:', error);
+        showNotification('❌ Failed to delete note: ' + error.message, 'error');
+    }
+}
+// Core Functions
+function updateTenderCardUI(tenderId, isSaved) {
+    console.log(`🎨 Updating UI for tender ${tenderId}, saved: ${isSaved}`);
+    
+    // Find all save buttons for this tender (there might be multiple in search results)
+    const saveButtons = document.querySelectorAll(`[data-tender-id="${tenderId}"] .save-to-workspace-btn`);
+    
+    saveButtons.forEach(saveButton => {
+        if (isSaved) {
+            saveButton.innerHTML = '✅ Saved';
+            saveButton.style.background = '#27ae60';
+            saveButton.style.color = 'white';
+            saveButton.disabled = true;
+            saveButton.onclick = null; // Remove click handler
+        } else {
+            saveButton.innerHTML = '💾 Save to Workspace';
+            saveButton.style.background = '';
+            saveButton.style.color = '';
+            saveButton.disabled = false;
+            saveButton.onclick = function() { saveTenderToWorkspace(tenderId); };
+        }
+    });
+    
+    // Also update any other UI elements that show saved status
+    const savedIndicators = document.querySelectorAll(`[data-tender-id="${tenderId}"] .saved-indicator`);
+    savedIndicators.forEach(indicator => {
+        indicator.style.display = isSaved ? 'inline-block' : 'none';
+    });
+}
+
+async function removeFromWorkspace(workspaceTenderId) {
+    console.log(`🗑️ Removing workspace tender ${workspaceTenderId}`);
+    
+    if (!confirm('Are you sure you want to remove this tender from your workspace?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/workspace/tenders/${workspaceTenderId}`, {
+            method: 'DELETE'
+        });
+        
+        // Check if response is OK first
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log("📡 Remove tender result:", result);
+        
+        if (result.success) {
+            console.log("✅ Tender removed successfully");
+            // Remove the card from UI immediately
+            const tenderCard = document.querySelector(`[data-tender-id="${workspaceTenderId}"]`);
+            if (tenderCard) {
+                tenderCard.remove();
+            }
+            showNotification('✅ Tender removed from workspace', 'success');
+            
+            // Update stats
+            await loadWorkspaceTenders(currentWorkspaceStatus);
+        } else {
+            throw new Error(result.detail || 'Failed to remove tender');
+        }
+    } catch (error) {
+        console.error('Error removing tender:', error);
+        showNotification(`❌ Error: ${error.message}`, 'error');
+    }
+}
+
+
+
+
+function filterWorkspace(status) {
+    currentWorkspaceStatus = status;
+    
+    // Update active filter button
+    document.querySelectorAll('.status-filter').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    loadWorkspaceTenders(status);
+}
+
+function getStatusDisplay(status) {
+    const statusMap = {
+        'pending': '⏳ Pending',
+        'interested': '💡 Interested', 
+        'not_eligible': '❌ Not Eligible',
+        'submitted': '📤 Submitted',
+        'won': '🏆 Won',
+        'lost': '💔 Lost'
+    };
+    return statusMap[status] || status;
+}
+
+function getScoreClass(score) {
+    if (score >= 80) return 'score-high';
+    if (score >= 60) return 'score-medium';
+    if (score >= 40) return 'score-low';
+    return 'score-very-low';
+}
+
+function showTenderSearch() {
+    // This function should switch back to tender search view
+    // You'll need to implement this based on your navigation system
+    initializeTenderSearch();
+}
+
+function showNotification(message, type = 'info') {
+    alert(`${type === 'success' ? '✅' : '❌'} ${message}`);
+}
+
+
+
+// Load existing profile data
+async function loadCompanyProfileData() {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch(`${API_BASE}/company/profiles`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const profile = await response.json();
+            
+            // Populate form fields
+            document.getElementById('company_name').value = profile.company_name || '';
+            document.getElementById('registration_number').value = profile.registration_number || '';
+            document.getElementById('vat_number').value = profile.vat_number || '';
+            document.getElementById('industry_sector').value = profile.industry_sector || '';
+            document.getElementById('services_provided').value = profile.services_provided || '';
+            document.getElementById('years_of_experience').value = profile.years_of_experience || 0;
+            document.getElementById('cidb_grading').value = profile.cidb_grading || '';
+            document.getElementById('bbbee_level').value = profile.bbbee_level || '';
+            document.getElementById('contact_email').value = profile.contact_email || '';
+            document.getElementById('contact_phone').value = profile.contact_phone || '';
+            document.getElementById('physical_address').value = profile.physical_address || '';
+            
+            // Set selected provinces
+            if (profile.operating_provinces) {
+                const provinces = profile.operating_provinces.split(',');
+                const provinceSelect = document.getElementById('operating_provinces');
+                Array.from(provinceSelect.options).forEach(option => {
+                    option.selected = provinces.includes(option.value);
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+    }
+}
+
+// Usage Dashboard function
+function showUsageDashboard() {
+    const usageHTML = PlanManager.showUsageDashboard();
+    const pageContent = document.getElementById('pageContent');
+    pageContent.innerHTML = `
+        <div style="padding: 20px;">
+            <h2 style="color: #2c3e50; margin-bottom: 20px;">📊 Plan & Usage Dashboard</h2>
+            ${usageHTML}
+        </div>
+    `;
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Navigation clicks
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateTo(link.getAttribute('data-page'));
+        });
+    });
+    
+    // Use event delegation for logout button (works for dynamically created elements)
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'logoutBtn' || e.target.closest('#logoutBtn')) {
+            e.preventDefault();
+            AuthManager.logout();
+        }
+    });
+
+    // Handle URL hash changes
+    window.addEventListener('hashchange', () => {
+        const page = window.location.hash.substring(1) || 'home';
+        navigateTo(page);
+    });
+    
+    // Initial page load
+    const initialPage = window.location.hash.substring(1) || 'home';
+    navigateTo(initialPage);
+    AuthManager.init();
+});
+
+// Export for global access
+window.PlanManager = PlanManager;
+window.AuthManager = AuthManager;
+window.showUsageDashboard = showUsageDashboard;
+    </script>
+</body>
+</html>

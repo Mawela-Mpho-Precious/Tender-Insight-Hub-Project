@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\Admin\tender-insight\venv
+set VIRTUAL_ENV=C:\Users\Admin\Downloads\Final_Version (2) 1\Final_Version\tenderTryyyy\tenderTryyyy\tenderTry\tender-insight\tender-insight\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

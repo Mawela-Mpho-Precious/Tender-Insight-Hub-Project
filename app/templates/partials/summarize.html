@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tender Summarization</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .form-section {
+      padding: 30px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      background: #fff;
+      transition: border-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    input[type="file"]:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+
+    button {
+      background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    .results-section {
+      padding: 30px;
+    }
+
+    .tender-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .tender-title {
+      font-size: 1.3em;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    .tender-details {
+      color: #6c757d;
+      line-height: 1.6;
+    }
+
+    #matchTenderBtn {
+      display: none;
+      background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%);
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: transform 0.2s ease;
+    }
+
+    #matchTenderBtn:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📄 Tender Summarization</h1>
+      <p>Upload a tender document (.pdf or .zip) to generate a summary</p>
+    </header>
+
+    <section class="form-section">
+      <form id="summarizeForm" action="/api/tenders/summarize" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="file">Upload Tender Document</label>
+          <input type="file" id="file" name="file" accept=".pdf,.zip" required>
+        </div>
+        <button type="submit">Summarize</button>
+      </form>
+    </section>
+
+    <section class="results-section" id="results" style="display: none;">
+      <div class="tender-card">
+        <h3 class="tender-title">Summary</h3>
+        <div class="tender-details" id="summaryText">
+          <!-- Summary will appear here -->
+        </div>
+      </div>
+
+      <button id="matchTenderBtn">Match This Tender</button>
+      <div id="matchResult" style="margin-top:20px;"></div>
+    </section>
+  </div>
+
+  <script>
+    const form = document.getElementById("summarizeForm");
+    const resultsSection = document.getElementById("results");
+    const summaryText = document.getElementById("summaryText");
+    const matchBtn = document.getElementById("matchTenderBtn");
+    const matchResult = document.getElementById("matchResult");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      try {
+        const response = await fetch("/api/tenders/summarize", {
+          method: "POST",
+          body: formData
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          summaryText.textContent = data.summary || "No summary available.";
+          resultsSection.style.display = "block";
+
+          // Show Match button after summary
+          matchBtn.style.display = "inline-block";
+          matchBtn.onclick = () => runReadinessCheck(data.summary);
+        } else {
+          summaryText.textContent = "❌ Failed to summarize document.";
+          resultsSection.style.display = "block";
+        }
+      } catch (err) {
+        console.error(err);
+        summaryText.textContent = "⚠️ Error connecting to server.";
+        resultsSection.style.display = "block";
+      }
+    });
+
+    async function runReadinessCheck(summary) {
+      try {
+        const response = await fetch("/api/tenders/match", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ summary })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          matchResult.innerHTML = `
+            <h3>Suitability Score: ${result.suitability_score}/100</h3>
+            <ul>${result.checklist.map(c => `<li>${c}</li>`).join("")}</ul>
+            <p><b>Recommendation:</b> ${result.recommendation}</p>
+          `;
+        } else {
+          matchResult.innerHTML = `<p style="color:red;">Failed to run readiness check.</p>`;
+        }
+      } catch (err) {
+        console.error(err);
+        matchResult.innerHTML = `<p style="color:red;">Error running readiness check.</p>`;
+      }
+    }
+  </script>
+</body>
+</html>

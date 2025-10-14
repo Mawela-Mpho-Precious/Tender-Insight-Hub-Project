@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from app.database import Base
+from sqlalchemy.sql import func
+from sqlalchemy import JSON
 
 class Tender(Base):
     __tablename__ = "tenders"
@@ -16,5 +18,6 @@ class Tender(Base):
     estimated_value = Column(Float)
     buyer_name = Column(String)
     buyer_id = Column(String)
+    documents = Column(JSON)
     
     # We'll store the raw OCDS data in MongoDB
