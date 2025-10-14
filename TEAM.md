@@ -83,7 +83,22 @@ This week, our focus was on the **Company Profile Management** feature and final
 - This week’s experience reinforced the importance of teamwork and adaptability. As a team, we were open to guidance from our supervisor and used it constructively to refine our approach.  
 - I learned that effective leadership is not only about making decisions but also about ensuring that the team stays focused on solving challenges collectively. Guiding the team through the API retrieval challenge also highlighted the importance of patience, communication, and encouraging problem-solving collaboration.  
 
+### Week 5 Team Lead Report  
 
+*Lead:* Hope Lerato Nkoana  
+
+---
+
+### Key Decisions Made During Leadership  
+- During this week, the team focused on refining the AI Summarization feature to link it with the match tender functionality. This improvement aimed to make the summarization more accurate and directly connected to the tender matching process.  
+
+### Challenges Faced and How They Were Addressed  
+- A major challenge was that the match tender functionality was not linked with the company profiles, which affected the accuracy of the summarization.  
+- To address this, the team worked on reviewing the database relationships and integration points to ensure the tender matching and company profile data were properly connected.  
+
+### Reflections on Teamwork and Leadership  
+- This week highlighted the importance of clear communication and coordination when handling feature refinements.  
+- As a team, we learned that close collaboration and regular check-ins are key to quickly identifying and resolving integration issues. The leadership encouraged open discussion and collective problem-solving, which helped the team stay focused and productive.
 
 
 
