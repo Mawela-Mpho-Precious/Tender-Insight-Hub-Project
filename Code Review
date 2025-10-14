@@ -1,0 +1,254 @@
+Code Review – Week 2
+Reviewer: Kelebogile Dlamini
+
+This script is designed to test and validate API endpoints for the South African eTenders OCDS API. It systematically tries multiple possible endpoints, verifies their responses, and falls back to the Swagger documentation if none respond successfully. Once a working endpoint is found, it runs further tests for both API-side filtering (searchText parameter) and client-side search, ensuring that tender data can be searched reliably.
+
+Strengths
+
+Systematic endpoint discovery
+The script smartly tests several endpoint variations and gracefully falls back to the Swagger API documentation. Excellent investigative strategy for uncertain APIs.
+Robust error handling
+Uses try/except effectively to catch network and JSON parsing errors, providing readable error messages without crashing.
+Readable and engaging logging
+The use of emojis and structured print statements makes it easy to follow test progress and results — especially useful for debugging.
+Comprehensive testing approach
+Both server-side (searchText) and client-side filtering mechanisms are tested, ensuring reliability even if the API’s built-in search fails.
+
+
+Areas for Improvement
+Code structure and duplication
+The file currently includes multiple distinct test scenarios (endpoint discovery, client-side search, and keyword testing) in one script.
+Consider refactoring them into separate functions or files for better readability and maintainability.
+The requests.get() logic is repeated several times; a reusable helper function (e.g., fetch_json()) would reduce redundancy.
+Pagination support
+Fetching only pageSize=100 results may miss additional tenders.
+If the API supports pagination, implement a loop to request all available pages.
+Swagger integration
+Currently, the script prints available paths but doesn’t re-test them.
+We could extend this to automatically retry the endpoints retrieved from Swagger to identify additional working URLs.
+Date handling consistency
+The script uses 30 days in one place and 60 days in another.
+Standardize or make this configurable through a variable or argument.
+Output clarity
+The raw JSON dump is truncated after 500 characters, which is good for debugging.
+For ongoing testing, consider printing structured summaries (e.g., number of tenders found, top tender titles) instead of raw JSON.
+
+
+Suggested Improvements
+Create a helper function to centralize HTTP requests:
+def fetch_json(url, params=None, timeout=15):
+    try:
+        response = requests.get(url, params=params, timeout=timeout, headers={"Accept": "application/json"})
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        print(f"❌ Request failed: {e}")
+        return None
+
+Overall Assessment
+A strong exploratory testing script with clear output, practical testing coverage, and good error handling. Once refactored into modular components and enhanced with pagination, it will be well-suited for production-level API testing and documentation validation.
+________________________________________ 
+
+
+Week 4
+Code Reviewer: Hope Lerato Nkoana
+
+Executive Summary
+
+Our FastAPI application is  well-structured and functional with a good foundation. The architecture follows FastAPI best practices and our code is organized logically. Here are our specific observations and recommendations for improvement.
+
+Architecture & Structure: 
+Strengths:
+-	Clean separation of concerns with proper routing, services, and models
+-	Good use of FastAPI features (lifespan, dependencies, routers)
+-	Proper project structure that scales well
+-	SPA-friendly with template serving endpoints
+
+Our File Structure:
+
+tender_insight_hub/
+├── app/
+│   ├── routes/          
+│   ├── services/        
+│   ├── models
+│   ├── templates/       
+│   └── database.py      
+
+Detailed Code Analysis
+
+1. main.py - Overall Structure: 
+python
+Good use of lifespan context manager
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    yield
+
+Proper router inclusion
+app.include_router(tenders.router, prefix="/api/tenders", tags=["tenders"])
+
+2. Security & Configuration: NEEDS ATTENTION
+python
+ Security concern - too permissive CORS in our code
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],   - Allows ALL origins in production!
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+Recommended fix for our production deployment:
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:8000",
+        "https://ourdomain.com"  # Our production domain
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
+)
+
+3. Error Handling: CAN BE IMPROVED
+python
+Inconsistent error handling in our endpoints
+@app.post("/api/tenders/summarize")
+async def summarize_tender(file: UploadFile = File(...)):
+    try:
+        # ... our code ...
+    except Exception as e:
+        return {"error": f"Summarization failed: {str(e)}"}  # ✅ Good!
+    finally:
+        # ... cleanup ...
+        
+But elsewhere in our health check:
+@app.get("/api/health")
+async def health_check(db: Session = Depends(get_db)):
+    try:
+        db.execute("SELECT 1")
+        return {"status": "healthy"}  
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}  
+
+Recommended: Use HTTPException for consistency across our API
+from fastapi import HTTPException
+
+except Exception as e:
+    raise HTTPException(
+        status_code=500, 
+        detail="Internal server error during summarization"
+    )
+
+4. Code Duplication: IDENTIFIED IN OUR CODE
+python
+We have duplicate summarization endpoints
+@app.post("/api/tenders/summarize")  # In our main.py
+AND in our tenders_summarize.py router
+
+Recommendation for our team: Choose one approach
+Option A: Keep in main.py (simpler)
+Option B: Move entirely to router (more organized)
+
+5. Template Handling: GOOD with minor improvements needed
+python
+ Good fallback handling in our template function
+def read_html_template(template_name: str = "base.html"):
+    try:
+        with open(template_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        return fallback_template  - Good practice
+
+Our template reading could be more efficient with caching
+from functools import lru_cache
+
+@lru_cache(maxsize=10)
+def read_html_template(template_name: str = "base.html"):
+ 6. Database & Dependencies:  SOLID
+python
+Good use of FastAPI dependencies in our code
+@app.get("/api/health")
+async def health_check(db: Session = Depends(get_db
+
+ Proper database session management in our application
+Performance & Scalability
+
+Our Strengths:
+-	Async/await used appropriately throughout our code
+-	Database connection pooling via SQLAlchemy
+-	Template caching (implicit via variable assignment)
+
+Areas We Can Improve:
+python
+Our large file handling could be optimized
+@app.post("/api/tenders/summarize")
+async def summarize_tender(file: UploadFile = File(...)):
+     No file size validation in our current implementation
+     Let's add file size limits to our upload handler:
+    from fastapi import HTTPException
+    
+    MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+    file_size = 0
+    chunk_size = 8192
+    
+    with open(file_path, "wb") as f:
+        while content := await file.read(chunk_size):
+            file_size += len(content)
+            if file_size > MAX_FILE_SIZE:
+                raise HTTPException(413, "File too large")
+            f.write(content)
+Security Assessment
+
+What We're Doing Well:
+-	SQL injection protection via SQLAlchemy ORM
+-	File type validation for uploads
+-	Temporary file cleanup  in our summarization
+
+Areas Our Team Should Address:
+1. CORS too permissive (as mentioned)
+2. No rate limiting on our summarization endpoint
+3. No file virus scanning for uploads
+4. Error messages might expose internals in some endpoints
+
+Our Code Quality Metric
+
+Category	Rating	Comments
+Structure	Excellent	Clean separation of concerns
+Error Handling	Good	Inconsistent but functional
+Security	Fair	CORS needs our attention
+Performance	Good	Async operations used well
+Maintainability 	Excellent	Well-organized, readable
+Documentation	Basic	Some endpoints documented
+
+
+
+Priority Recommendations for Our Team
+
+HIGH PRIORITY:
+1.	Fix CORS configuration for our production deployment
+2.	Standardize error handling across all our endpoints
+3.	Remove duplicate summarization endpoint from our codebase
+
+MEDIUM PRIORITY:
+1.	Add file size limits for our upload endpoints
+2.	Implement rate limiting for our summarization service
+3.	Add request validation with Pydantic models throughout our API
+
+NICE TO HAVE:
+1.	Add comprehensive logging to monitor our application
+2.	Implement response caching for our search results
+3.	Add API versioning as our application evolves
+
+What's Working Well in Our Implementation
+
+1.	FastAPI best practices followed correctly throughout
+2.	Good project structure that's maintainable by our team
+3.	Proper async handling in our file operations
+4.	Clean dependency injection pattern in our routes
+5.	Good template management with fallbacks for our SPA
+
+Our Overall Assessment: B+
+Our code demonstrates **strong understanding of FastAPI and good software architecture principles. With the security improvements and some consistency fixes, our application could easily be an A-grade production application.
+The foundation our team has built is excellent - we should focus on the high-priority security items first, then gradually implement the other improvements.
