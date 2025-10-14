@@ -66,6 +66,24 @@ This week, our focus was on the **Company Profile Management** feature and final
 - Continue testing keyword search and filtering features with real tender data.  
 - Prepare documentation for all implemented features to ensure smooth knowledge transfer and team alignment.
 
+### Week 4 Team Lead Report  
+
+**Lead:** Ayanda Girly Khalo  
+
+---
+
+### Key Decisions Made During Leadership  
+- During this week’s team meetup, we received valuable insights from our supervisor regarding the AI summarization feature. Based on this feedback, I led the decision to integrate the summarization function with the search button. This allows the system to summarize all PDFs associated with a search query, ensuring that the summarization tool is practical and directly connected to user actions.  
+
+### Challenges Faced and How They Were Addressed  
+- One of the major challenges we encountered was retrieving documents from the API and correctly matching them with the relevant tender. This issue initially slowed down our progress, as it was critical to ensure that the summarization applied to the correct documents.  
+- To address this, the team collaborated to refine our API calls and implement checks that improved document retrieval accuracy. Through iterative testing and adjustments, we managed to align the retrieved documents with the intended tenders.  
+
+### Reflections on Teamwork and Leadership  
+- This week’s experience reinforced the importance of teamwork and adaptability. As a team, we were open to guidance from our supervisor and used it constructively to refine our approach.  
+- I learned that effective leadership is not only about making decisions but also about ensuring that the team stays focused on solving challenges collectively. Guiding the team through the API retrieval challenge also highlighted the importance of patience, communication, and encouraging problem-solving collaboration.  
+
+
 
 
 
