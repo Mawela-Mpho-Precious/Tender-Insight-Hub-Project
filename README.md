@@ -25,7 +25,7 @@ The system supports team collaboration, AI-assisted insights, and multi-tier Saa
   - Buyer (organ of state)  
   - Budget range  
 - Results are re-ranked based on relevance after filters are applied.
-![Search](static/images/search.jpg)
+![Search](static/search.jpg)
 
 ---
 
