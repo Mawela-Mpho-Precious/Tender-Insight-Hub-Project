@@ -49,6 +49,100 @@ Overall Assessment
 A strong exploratory testing script with clear output, practical testing coverage, and good error handling. Once refactored into modular components and enhanced with pagination, it will be well-suited for production-level API testing and documentation validation.
 ________________________________________ 
 
+Week 3 
+Code Reviewer: Mawela Mpho Precious
+
+Code Review: Company Profile Management
+1. Overview
+
+The Company Profile Management module enables registered teams to create, view, and update their company profiles within the system.
+Each team must maintain an up-to-date business profile, including certifications, industry sectors, services, geographic coverage, and contact information.
+These profiles are essential for readiness scoring and filtering companies based on qualifications and sectors.
+
+2. Functionality Summary
+
+Features Implemented:
+
+Create and update company profiles linked to the authenticated user’s team_id.
+
+Retrieve the existing company profile for the logged-in team.
+
+Dynamically load profile data in the frontend through API calls.
+
+Provide selectable lists of industry sectors, provinces, and certifications through dedicated endpoints.
+
+Validate and serialize data using Pydantic models.
+
+Manage database interactions using SQLAlchemy ORM.
+
+Endpoints:
+
+HTTP Method	Endpoint	Description
+GET	/company/options/industries	Returns a list of valid industry sectors
+GET	/company/options/provinces	Returns a list of available provinces
+GET	/company/options/certifications	Returns available certifications
+POST	/company/profiles	Creates or updates a company profile
+GET	/company/profiles	Retrieves the company profile for the current user’s team
+3. Code Structure
+File	Description
+models/company_profile.py	Defines CompanyProfileBase, CompanyProfileCreate, CompanyProfileUpdate, and response schemas using Pydantic
+routes/company.py	Implements FastAPI routes for company profile creation, retrieval, and options fetching
+frontend/profile.js	Handles frontend form data population using API responses
+4. Strengths
+
+Clear and modular use of Pydantic models, with separate classes for base, create, update, and response models.
+
+Effective use of dependency injection (Depends(get_db) and Depends(get_current_user)), improving testability and maintainability.
+
+Proper error handling and transaction rollback to prevent inconsistent database states.
+
+Modular and descriptive API routes, improving documentation and readability.
+
+Frontend integration is straightforward, with dynamic population of form fields based on the user’s data.
+
+5. Areas for Improvement
+
+-Duplicate Pydantic Models
+CompanyProfileCreate is defined both in the models and in the routes.
+Recommendation: Use a single schema definition by importing it from a central schemas module to maintain consistency and reduce redundancy.
+
+-Use of Mutable Default Arguments
+Fields such as
+certifications: Optional[Dict] = {}
+geographic_coverage: Optional[Dict] = {}
+
+-use mutable default values that can lead to shared state between instances.
+Recommendation: Replace with Field(default_factory=dict).
+
+-Inconsistent Data Representation
+certifications and operating_provinces are stored as strings or dictionaries inconsistently.
+Recommendation: Store them in a JSON field using SQLAlchemy’s JSON data type for more flexibility and cleaner serialization.
+
+-Missing Response Models
+Endpoints currently return raw dictionaries without a defined response_model.
+Recommendation: Add response_model=CompanyProfileResponse in the route definitions to enforce response validation and improve the generated OpenAPI documentation.
+
+6.Validation Enhancements
+Add validators for fields such as phone numbers, experience years, and turnover to prevent invalid entries.
+Example:
+
+@field_validator("years_of_experience")
+def validate_experience(cls, value):
+    if value < 0:
+        raise ValueError("Years of experience cannot be negative")
+    return value
+
+
+7. Frontend Improvements
+
+Handle cases where the province list or certifications are empty or invalid more gracefully.
+
+Provide confirmation or alert messages upon successful profile submission.
+
+8. Recommendations for Future Enhancements
+
+Readiness Scoring: Integrate profile completeness and sector data to automatically calculate company readiness scores.
+
 
 Week 4
 Code Reviewer: Hope Lerato Nkoana
