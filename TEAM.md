@@ -30,6 +30,41 @@ This week, we successfully implemented data extraction from the **Tender Insight
 - Dividing tasks allowed the team to work efficiently and made collaboration smoother.  
 - Leading the team taught me the importance of clear communication and quickly addressing blockers to keep progress on track.  
 - Working through the API issues together reinforced the value of persistence and problem-solving in a team setting.  
+# Team Leadership Log
+
+## Week 3 Team Lead Report
+**Lead:** Kelebogile Dlamini
+
+### Responsibilities / Decisions Made
+This week, our focus was on the **Company Profile Management** feature and finalizing the **Tender Document Summarization** process.
+
+- Worked on the Company Profile schema and discussed its required fields (industry sector, services, certifications, geographic coverage, years of experience, contact information).  
+- Decided that each team member should attempt to work on the Company Profile individually and present their solution during the next meeting to move forward.  
+- Completed the AI summarization feature:  
+  - Implemented text extraction for PDF and ZIP tender documents.  
+  - Integrated a HuggingFace transformer model to generate summaries emphasizing objectives, scope, deadlines, and eligibility criteria.  
+  - Successfully tested the summarization pipeline with sample documents.
+
+### Key Decisions Made
+- Chose MongoDB as the NoSQL database for storing tender text and summaries.  
+- Finalized the first iteration of the summarization pipeline and approved it for integration.  
+- Adopted a collaborative approach to Company Profile development by having all team members contribute individually.
+
+### Challenges Faced and Solutions
+- The Company Profile feature is still incomplete, which slowed progress. To solve this, everyone will work on their own version and merge ideas next week.  
+- Some tender PDFs had extraction issues, which were resolved by testing and selecting the most reliable PDF processing library.
+
+### Reflections on Teamwork and Leadership
+- Having all members contribute to the Company Profile feature encourages creativity and will help us find the best approach.  
+- Completing the AI summarization feature boosted team confidence and gave us a sense of progress.  
+- This week required me to motivate the team and make sure we stay focused despite the challenges with the profile feature.
+
+### Week 4 Goals
+- Merge individual contributions for the **Company Profile Management** feature and finalize backend implementation.  
+- Connect FastAPI endpoints for Company Profile with PostgreSQL and MongoDB.  
+- Begin integrating AI summarization into the main tender workflow for end-to-end testing.  
+- Continue testing keyword search and filtering features with real tender data.  
+- Prepare documentation for all implemented features to ensure smooth knowledge transfer and team alignment.
 
 
 
