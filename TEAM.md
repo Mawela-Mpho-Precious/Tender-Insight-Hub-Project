@@ -100,7 +100,57 @@ This week, our focus was on the **Company Profile Management** feature and final
 - This week highlighted the importance of clear communication and coordination when handling feature refinements.  
 - As a team, we learned that close collaboration and regular check-ins are key to quickly identifying and resolving integration issues. The leadership encouraged open discussion and collective problem-solving, which helped the team stay focused and productive.
 
+## Final Week Team Lead Report
 
+**Lead:** Kelebogile Dlamini
+
+---
+
+## Responsibilities / Decisions Made
+
+As we reached the final phase of the Tender Insight Hub project, our primary focus was on system integration, testing, and documentation. This stage involved connecting all previously developed modules and ensuring that the system functioned smoothly as a complete SaaS solution.
+
+Key tasks and decisions included:
+
+- Finalized the Company Profile Management feature and fully integrated it with the Match Tender functionality.
+- Conducted end-to-end testing for all core features — keyword search, filtering, AI summarization, readiness scoring, and workspace tracking.
+- Implemented final bug fixes and optimized database queries for both PostgreSQL (SQL) and MongoDB (NoSQL) components.
+- Reviewed and updated API documentation on Swagger to reflect the final endpoints and usage examples.
+- Ensured feature access restrictions based on SaaS tiers (Free, Basic, and Pro) were functioning as intended.
+- Compiled and formatted all project documentation, including design reports, system flow diagrams, and individual team lead reports for submission.
+
+---
+
+## Challenges Faced and How They Were Addressed
+
+### Integration Conflicts
+Merging different components (especially the AI summarization with readiness scoring) caused minor data inconsistencies. These were resolved through joint debugging sessions and improved communication during version control operations.
+
+### Performance Issues
+During testing, we noticed delays in summarization for large tender documents. The issue was mitigated by caching summarized results in MongoDB to avoid repeated processing.
+
+### Final Deployment Testing
+The team encountered issues when deploying to the testing environment. After identifying missing dependencies in the FastAPI setup, we reconfigured the environment and confirmed successful deployment.
+
+---
+
+## Reflections on Teamwork and Leadership
+
+This phase required strong coordination, as multiple features needed to work together seamlessly. As team lead, I emphasized consistent communication through daily updates and GitHub progress tracking.
+
+Every team member demonstrated commitment and technical growth throughout the semester, contributing unique strengths to ensure the project’s success.
+
+Leading the final week taught me the importance of attention to detail, collaborative debugging, and thorough testing before delivery.
+
+I am proud of how far we have come — from setting up our FastAPI environment to delivering a fully functional AI-assisted tender management platform.
+
+---
+
+## Final Reflections on the Project
+
+The Tender Insight Hub project has been an enriching learning experience. We successfully implemented a real-world solution that leverages AI integration, multi-database management, and modern web technologies to address challenges faced by SMEs in public procurement.
+
+This project not only strengthened our technical skills in API development, data management, and AI integration but also enhanced our teamwork, leadership, and project management abilities. We are confident that the knowledge gained from this project will serve as a strong foundation for our future careers in ICT and software development.
 
 
 
