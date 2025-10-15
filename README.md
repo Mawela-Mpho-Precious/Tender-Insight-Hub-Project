@@ -25,7 +25,7 @@ The system supports team collaboration, AI-assisted insights, and multi-tier Saa
   - Buyer (organ of state)  
   - Budget range  
 - Results are re-ranked based on relevance after filters are applied.
-![Search](static/searchTenders.png)
+![Search](static/SearchTenders.png)
 
 ---
 
@@ -40,7 +40,7 @@ The system supports team collaboration, AI-assisted insights, and multi-tier Saa
   - Contact information  
 - Profiles are editable and used for readiness scoring and filtering.
 [companyProfile](static/companyProfile1.png)
-[companyProfile](static/companyProfile2.png)
+
 ---
 
 ### 🧬 3. Tender Document Summarization (AI Integration)
