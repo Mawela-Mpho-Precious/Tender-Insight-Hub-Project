@@ -25,7 +25,7 @@ The system supports team collaboration, AI-assisted insights, and multi-tier Saa
   - Buyer (organ of state)  
   - Budget range  
 - Results are re-ranked based on relevance after filters are applied.
-![Search](static/search.jpg)
+![Search](static/searchTenders.png)
 
 ---
 
@@ -39,7 +39,8 @@ The system supports team collaboration, AI-assisted insights, and multi-tier Saa
   - Years of experience  
   - Contact information  
 - Profiles are editable and used for readiness scoring and filtering.
-
+[companyProfile](static/companyProfile1.png)
+[companyProfile](static/companyProfile2.png)
 ---
 
 ### 🧬 3. Tender Document Summarization (AI Integration)
@@ -51,7 +52,7 @@ The system supports team collaboration, AI-assisted insights, and multi-tier Saa
   - Deadlines  
   - Eligibility criteria  
   - Other relevant details as defined by design.
-
+![AI](static/AISummary.png)
 ---
 
 ### 💡 4. Readiness Scoring & Suitability Check
@@ -61,7 +62,7 @@ The system supports team collaboration, AI-assisted insights, and multi-tier Saa
   - **Checklist** (e.g., “CIDB: YES”, “Operates in Province: NO”)  
   - **Recommendation** (e.g., “Suitable – low competition expected”).  
 - Scores are stored and shown with tenders in the workspace.
-
+![Match](static/MatchTender.png)
 ---
 
 ### 📂 5. Workspace & Tender Tracking
@@ -78,7 +79,8 @@ The system supports team collaboration, AI-assisted insights, and multi-tier Saa
   - Match score  
 - Tenders are dynamically sorted by match score.  
 - Supports internal collaboration (notes, tasks, comments).
-
+![work](static/companyWorkspace1.png)
+![work](static/companyWorkspace2.png)
 ---
 
 ## 🌐 Public API Exposure
