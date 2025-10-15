@@ -1,7 +1,8 @@
 # System Design
 
 ## Architecture Diagram
-(Insert diagram link or upload later)
+![Screenshot of project](static/tender-diagram.png)
+
 
 ## Technologies Used
 - FastAPI (Backend)
