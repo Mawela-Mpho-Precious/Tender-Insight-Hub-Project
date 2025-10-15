@@ -346,3 +346,239 @@ What's Working Well in Our Implementation
 Our Overall Assessment: B+
 Our code demonstrates **strong understanding of FastAPI and good software architecture principles. With the security improvements and some consistency fixes, our application could easily be an A-grade production application.
 The foundation our team has built is excellent - we should focus on the high-priority security items first, then gradually implement the other improvements.
+
+# Code Review Report- Week 5 and 6
+**Code Reviewer:** Ayanda Girly Khalo 
+  
+
+---
+
+## 1. Overview  
+The Tender Management System is a **FastAPI backend** with a **JavaScript frontend** that allows users to:  
+- Search and save tenders to a personal workspace  
+- Track tender status through various stages (pending, interested, submitted, etc.)  
+- Add team notes and tasks to tenders  
+- Perform AI-powered tender analysis and matching  
+
+---
+
+## 2. Functionality Assessment  
+
+### Working Correctly  
+- **Tender Search & Saving:** Users can search and save tenders to their workspace  
+- **Status Management:** Status updates work correctly (pending → interested → submitted, etc.)  
+- **Workspace Organization:** Tenders are properly organized with filtering options  
+- **Basic CRUD Operations:** Create, read, update, and delete operations function as expected  
+
+###  Partial Implementation  
+- **Notes System:** Backend implemented, frontend integration still needs testing  
+- **AI Integration:** Summarization and matching exist but require better error handling  
+- **User Management:** Basic `user_id` support; full authentication not yet implemented  
+
+### Not Working / Issues Found  
+- **Duplicate Routes:** Conflicting endpoint definitions (now resolved)  
+- **Database Schema Mismatches:** Model-table mismatches found initially  
+- **Frontend-Backend Communication:** Some API calls failed due to CORS and endpoint issues  
+
+---
+
+## 3. Endpoints Analysis  
+
+### Workspace Routes (`/api/workspace/*`)
+```python
+POST /tenders              # Save tender to workspace 
+GET /tenders               # Get workspace tenders  
+PUT /tenders/{id}/status   # Update tender status 
+DELETE /tenders/{id}       # Remove tender 
+GET /tenders/{id}/notes    # Get tender notes 
+POST /tenders/{id}/notes   # Add note to tender ️
+Tender Routes (/api/tenders/*)
+POST /summarize-from-data  # AI summarization 
+POST /{id}/match           # Tender matching 
+4. Strengths
+Architecture
+
+Clean separation between models, routes, and database layer
+
+RESTful endpoint design
+
+Modular and well-organized codebase
+
+Database Design
+class WorkspaceTender(Base):
+    # Proper field definitions and relationships
+    # Strong use of foreign keys and indexes
+
+class WorkspaceTenderNote(Base):
+    # Linked to parent tender
+    # Includes task tracking fields
+
+Error Handling
+
+Consistent {success, message, data} response format
+
+Safe transaction handling (commit/rollback)
+
+User-friendly frontend error messages
+
+User Experience
+
+Real-time updates without page reloads
+
+Works gracefully even when AI features fail
+
+Responsive and well-structured UI
+
+5. Areas for Improvement
+ High Priority
+Input Validation & Security
+from pydantic import validator, Field
+
+class NoteCreate(BaseModel):
+    content: str = Field(..., min_length=1, max_length=1000)
+    is_task: bool = False
+    
+    @validator('content')
+    def content_not_empty(cls, v):
+        if not v.strip():
+            raise ValueError('Note content cannot be empty')
+        return v.strip()
+
+Authentication & Authorization
+@router.post("/tenders")
+async def save_tender_to_workspace(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    workspace_tender = WorkspaceTender(user_id=current_user.id)
+
+⚙️ Medium Priority
+Database Optimization
+class WorkspaceTender(Base):
+    tender_id = Column(String(255), index=True)
+    user_id = Column(Integer, index=True)
+    status = Column(String(50), default="pending", index=True)
+
+Error Handling Consistency
+class ErrorResponse(BaseModel):
+    success: bool = False
+    error_code: str
+    message: str
+    details: Optional[Dict] = None
+
+ Low Priority
+Advanced Features
+
+Add soft delete with timestamps
+
+Implement logging for debugging and monitoring
+
+6. Validation Enhancements Needed
+Backend Validation
+class WorkspaceTenderCreate(BaseModel):
+    tender_id: str = Field(..., min_length=1, max_length=255)
+    title: str = Field(..., min_length=1, max_length=500)
+    ...
+
+Frontend Validation
+class TenderValidator {
+    static validateSaveData(data) {
+        const errors = [];
+        if (!data.tender_id?.trim()) errors.push('Tender ID is required');
+        if (!data.title?.trim()) errors.push('Title is required');
+        if (data.title?.length > 500) errors.push('Title too long');
+        return errors;
+    }
+}
+
+7. Frontend Improvements
+Error Handling & Feedback
+class ApiClient {
+    async request(endpoint, options = {}) {
+        try {
+            const response = await fetch(`${this.baseUrl}${endpoint}`, options);
+            if (!response.ok) throw new ApiError(response.status, await response.text());
+            return await response.json();
+        } catch (error) {
+            this.handleError(error);
+            throw error;
+        }
+    }
+}
+
+State Management
+class WorkspaceStore {
+    constructor() {
+        this.tenders = [];
+        this.notes = new Map();
+    }
+}
+
+Performance Optimizations
+
+Debounced search to reduce API calls
+
+Efficient rendering using document fragments
+
+Cleanup handlers to prevent memory leaks
+
+8. Security Recommendations
+Backend Security
+# Rate Limiting
+from slowapi import Limiter
+limiter = Limiter(key_func=get_remote_address)
+
+@router.post("/tenders")
+@limiter.limit("10/minute")
+
+
+Use parameterized queries to prevent SQL injection
+
+Restrict CORS to trusted domains
+
+9. Testing Recommendations
+Backend Tests (pytest)
+def test_save_tender_to_workspace():
+    response = client.post("/api/workspace/tenders", json={"tender_id": "test-123"})
+    assert response.status_code == 200
+    assert response.json()["success"] is True
+
+Frontend Tests (Jest)
+describe('Workspace Management', () => {
+    test('should save tender to workspace', async () => {
+        const mockTender = { id: 'test-123', title: 'Test Tender' };
+        global.fetch = jest.fn(() => Promise.resolve({ ok: true, json: () => ({ success: true }) }));
+        await saveTenderToWorkspace(mockTender.id);
+        expect(fetch).toHaveBeenCalled();
+    });
+});
+
+ Summary
+ What’s Working Well
+
+Core workspace functionality
+
+Clean database design
+
+Organized codebase
+
+Good error handling
+
+ Immediate Actions Needed
+
+Fix route duplication 
+
+Implement full authentication
+
+Improve validation and state management
+
+ Long-Term Improvements
+
+Add test coverage
+
+Optimize performance
+
+Strengthen security
+
+Expand documentation
+
